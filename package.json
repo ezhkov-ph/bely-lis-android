@@ -1,0 +1,23 @@
+{
+  "name": "bely-lis-android-build-tools",
+  "description": "Инструменты сборки независимого Firefox Android с российской цепочкой доверенных сертификатов",
+  "private": true,
+  "license": "MPL-2.0",
+  "keywords": [
+    "firefox-android",
+    "android-browser",
+    "geckoview",
+    "nss",
+    "russian-certificates",
+    "russian-trusted-root-ca",
+    "gosuslugi",
+    "arm64-apk"
+  ],
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "fetch:inputs": "node scripts/fetch-inputs.mjs",
+    "prepare:overlay": "node scripts/prepare-overlay.mjs",
+    "test": "node --test test/branding.test.mjs test/certdata.test.mjs"
+  }
+}

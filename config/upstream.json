@@ -1,0 +1,19 @@
+{
+  "repository": "https://github.com/mozilla-firefox/firefox.git",
+  "revision": "9cd094dbc3eac5df87a24e7a871e52880cb8cd42",
+  "tag": "FIREFOX-ANDROID_154_0_1_RELEASE",
+  "version": "154.0.1",
+  "verifiedOn": "2026-08-31",
+  "channel": "release",
+  "sourceFiles": [
+    "security/nss/lib/ckfw/builtins/certdata.txt",
+    "security/nss/lib/ckfw/builtins/certdata.perl",
+    "mobile/android/fenix/app/build.gradle",
+    "mobile/android/fenix/app/src/main/AndroidManifest.xml",
+    "mobile/android/fenix/app/src/main/res/values/strings.xml",
+    "mobile/android/fenix/app/src/main/res/values/static_strings.xml",
+    "mobile/android/config/mozconfigs/common",
+    "mobile/android/config/mozconfigs/android-aarch64/nightly",
+    "browser/config/version.txt"
+  ]
+}

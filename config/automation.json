@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "wslDistribution": "Ubuntu",
+  "autoPublish": true,
+  "releaseTagSuffix": "belylis.1",
+  "taskName": "Белый лис — проверка обновлений",
+  "dailyCheckTime": "10:00",
+  "requireCleanGit": true
+}

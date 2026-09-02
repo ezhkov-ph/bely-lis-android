@@ -1,0 +1,19 @@
+{
+  "displayName": "Белый лис",
+  "releaseApplicationId": "ru.belylis.browser",
+  "debugApplicationId": "ru.belylis.debug",
+  "logoStatus": "approved original project artwork",
+  "about": {
+    "default": "%1$s is an independent browser based on Mozilla Firefox source code, with additional Russian CA certificates. It is not an official Mozilla product and is not affiliated with or endorsed by Mozilla.",
+    "ru": "%1$s — независимый браузер на основе исходного кода Mozilla Firefox с дополнительными российскими сертификатами. Это не официальный продукт Mozilla; проект не связан с Mozilla и не одобрен ею."
+  },
+  "previousTestNameSha256": "a2f6fbcf37356e77526294258d702d8732063ed9eb095228e4715cc5e722aa2c",
+  "previousOverlaySha256": {
+    "mobile/android/fenix/app/src/main/AndroidManifest.xml": "c419a3fc21c5eaad9769342565baf8c6ca67f964fe94b8af58422e7a11c8f7e6",
+    "mobile/android/fenix/app/build.gradle": "242b6080114c600b6a25960859686e8ed9098e78789f65498d5b422e264fc098",
+    "mobile/android/fenix/app/src/main/res/values-ru/strings.xml": "828f8c4380b0affb0ab022ce24ad43801e2cd3f9789889b041d35ca46aeb7738",
+    "mobile/android/fenix/app/src/main/java/org/mozilla/fenix/home/ui/Wordmark.kt": "3393d02af1435a0af91c8cd240df2cb11c601b892436f8e38c5cc0dff6100231",
+    "mobile/android/fenix/app/src/main/java/org/mozilla/fenix/pbmlock/UnlockPrivateTabsScreen.kt": "b082e613db20b2ace0b2604639f7eef0824cbfaaa8ae0bc2842d536a60e83168",
+    "mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/biometric/ui/UnlockScreen.kt": "2776e44e4734f267d02f0b1f89b713ef216d0b19853f8ae47c464ba8609e4848"
+  }
+}

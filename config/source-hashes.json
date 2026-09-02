@@ -1,0 +1,14 @@
+{
+  "revision": "9cd094dbc3eac5df87a24e7a871e52880cb8cd42",
+  "files": {
+    "security/nss/lib/ckfw/builtins/certdata.txt": "81b7f2576333a2e360e673f912d7b0b7a765d836c731003e348a46cac5d37198",
+    "security/nss/lib/ckfw/builtins/certdata.perl": "cc964e693755833ba7e25554afb17d455774175042f68b7b15e2afb16d2d842a",
+    "mobile/android/fenix/app/build.gradle": "5cd9e5d0adf6ba31e8db55cf9e39739ab035ad0fcf36c522eb61b88b9a3d192b",
+    "mobile/android/fenix/app/src/main/AndroidManifest.xml": "b4fd3ac8afc220c56646b5cd76c7bcccf2e58bafab59fc18ab609bc4645a561c",
+    "mobile/android/fenix/app/src/main/res/values/strings.xml": "c4443ea029a750c712c45ab82bf4743de6b708561f9e77f2e3313d6a10043b65",
+    "mobile/android/fenix/app/src/main/res/values/static_strings.xml": "45ecb17fbacba5b60c119b3cbca5d155e6c0df64edd6bc25d004c2f9a4e09fd5",
+    "mobile/android/config/mozconfigs/common": "0d04eed533ee2151d49f351636c11878719fe82fbfdaa2db06d22863dc488faf",
+    "mobile/android/config/mozconfigs/android-aarch64/nightly": "c8879e18cb86716e0e8939d91c065fb1b324c5f04ce609ee4b0311bf35b3cf46",
+    "browser/config/version.txt": "c15af86ff2a610f7c3593faaff810dcebe07dd3b9fa51980f3afa65eb337f123"
+  }
+}

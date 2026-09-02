@@ -1,0 +1,19 @@
+{
+  "source": "Original project artwork supplied by the project owner",
+  "safePaddingPercent": 6,
+  "files": {
+    "branding/generated/white-fox-launcher-mdpi.png": "5b5f921efd58231db926227fceaaac673a20c144ab575bb6c32be46ec2864321",
+    "branding/generated/white-fox-launcher-hdpi.png": "8fb501f54dec08f1f567497fb8c23b91b9762cc2cf197f1da8978a88f2385db1",
+    "branding/generated/white-fox-launcher-xhdpi.png": "55baef207a38916a8030beb167d07de39aed40bbecf072ae936df772b28f4d55",
+    "branding/generated/white-fox-launcher-xxhdpi.png": "edc33b659bab4c3101cda6b530e9013dd158c26854aa5b0a9f69a87358d1a79a",
+    "branding/generated/white-fox-launcher-xxxhdpi.png": "b3544a35c9779dd793009609038b9aa109ee4104fb48e235a65a2c045a556a1b",
+    "branding/generated/white-fox-logo-1024.png": "84e812999a073a3d92f0c1bf175b5cb154230411354c20a347f7353df2033aa5",
+    "branding/source/white-fox-leaping.svg": "cd53c548ac32c9df234559016c5dfd08a8ff97ce950a6c2c68fb864bf2763e36",
+    "branding/source/white-fox-onboarding.svg": "a438a0afbacd1699f273d0352f79ad49075f936e4c29e2975c09dd64417c9d35",
+    "branding/generated/white-fox-onboarding-hdpi.png": "c58daceb5b517b8d297bcd908b7e0d54da3d54db9a9cecc0b4f061c7767c9fc8",
+    "branding/generated/white-fox-onboarding-mdpi.png": "7ba275a221881d9adee9ad7da45c3b46cad7cada4d1ed24bb9a869100df40cb9",
+    "branding/generated/white-fox-onboarding-xhdpi.png": "f036c8f57ccad08f2cf79c7dbd357c9813f2672ff7df92ad798daca35d868c72",
+    "branding/generated/white-fox-onboarding-xxhdpi.png": "cf9efb8a8155dbc9b0a68e42ac080abd3e60770f974c6c338452cbfb6070a483",
+    "branding/generated/white-fox-onboarding-xxxhdpi.png": "01e231e6c6ae313cef2d15ecba8a7470d1999fda9b1fa60b2e9e408fdbd950d7"
+  }
+}

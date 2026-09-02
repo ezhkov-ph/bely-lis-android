@@ -1,0 +1,20 @@
+{
+  "reviewedOn": "2026-08-31",
+  "provenance": "Downloaded over verified HTTPS from gu-st.ru; URLs referenced by official Sber and RuStore documentation. Fingerprints pinned from those downloaded files, not independently attested by Mozilla.",
+  "certificates": [
+    {
+      "file": "root.pem",
+      "label": "Russian Trusted Root CA",
+      "role": "root",
+      "sha256": "D26D2D0231B7C39F92CC738512BA54103519E4405D68B5BD703E9788CA8ECF31",
+      "url": "https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt"
+    },
+    {
+      "file": "intermediate.pem",
+      "label": "Russian Trusted Sub CA",
+      "role": "intermediate",
+      "sha256": "BBBDE2103E790B999EC62BD03CF625A5A2E7C316E10AFE6A490EEDEAD8B3FD9B",
+      "url": "https://gu-st.ru/content/lending/russian_trusted_sub_ca_pem.crt"
+    }
+  ]
+}
