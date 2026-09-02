@@ -53,7 +53,8 @@ foreach ($path in @('keys\white-fox-release.jks', '.env.signing.json')) {
 
 $runner = Join-Path $PSScriptRoot 'auto-release.ps1'
 $arguments = '-NoProfile -ExecutionPolicy Bypass -File "' + $runner + '"'
-$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $arguments -WorkingDirectory $root
+$powershell = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+$action = New-ScheduledTaskAction -Execute $powershell -Argument $arguments -WorkingDirectory $root
 $logon = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
 $logon.Delay = 'PT5M'
 $dailyTime = [DateTime]::ParseExact($config.dailyCheckTime, 'HH:mm', [Globalization.CultureInfo]::InvariantCulture)
