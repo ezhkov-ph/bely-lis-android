@@ -59,7 +59,7 @@ $logon = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
 $logon.Delay = 'PT5M'
 $dailyTime = [DateTime]::ParseExact($config.dailyCheckTime, 'HH:mm', [Globalization.CultureInfo]::InvariantCulture)
 $daily = New-ScheduledTaskTrigger -Daily -At $dailyTime
-$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 12) -DisallowStartIfOnBatteries
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 12) -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries
 $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
 Register-ScheduledTask -TaskName $taskName -Action $action -Trigger @($logon, $daily) -Settings $settings -Principal $principal -Description 'Проверка stable Firefox Android, безопасная сборка и публикация Белого лиса' -Force | Out-Null
 Write-Host "Задача установлена: $taskName"
