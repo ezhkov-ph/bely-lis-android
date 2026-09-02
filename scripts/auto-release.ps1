@@ -62,6 +62,7 @@ try {
     $candidate = Get-Content -LiteralPath $candidatePath -Raw | ConvertFrom-Json
     $current = Get-Content -LiteralPath (Join-Path $root 'config\upstream.json') -Raw | ConvertFrom-Json
     $isNew = $candidate.revision -ne $current.revision
+    $shouldUpdate = $isNew -and -not $PublishCurrent
 
     if ($CheckOnly) {
         [ordered]@{
@@ -100,7 +101,7 @@ try {
         Invoke-Checked $gh @('auth', 'status')
     }
 
-    if ($isNew) {
+    if ($shouldUpdate) {
         $backup = Join-Path $automation ('rollback-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
         New-Item -ItemType Directory -Force -Path $backup | Out-Null
         foreach ($path in @('README.md', 'config\upstream.json', 'config\source-hashes.json', 'config\branding-source-hashes.json')) {
@@ -157,7 +158,7 @@ try {
         )
     }
 
-    $version = if ($isNew) { $candidate.version } else { $current.version }
+    $version = if ($shouldUpdate) { $candidate.version } else { $current.version }
     $apk = Join-Path $root "artifacts\apk\bely-lis-$version-arm64-release.apk"
     foreach ($path in @($apk, (Join-Path $root 'artifacts\apk\SHA256SUMS.release'), (Join-Path $root 'artifacts\apk\build-report.release.json'))) {
         if (-not (Test-Path -LiteralPath $path)) {
@@ -167,7 +168,7 @@ try {
 
     if ($publish) {
         Write-Status 'running' 'publish' "Publishing White Fox $version"
-        if ($isNew) {
+        if ($shouldUpdate) {
             Invoke-Checked 'git' @('-C', $root, 'add', 'README.md', 'config/upstream.json', 'config/source-hashes.json', 'config/branding-source-hashes.json')
             Invoke-Checked 'git' @('-C', $root, 'commit', '-m', "Firefox Android $version")
             Invoke-Checked 'git' @('-C', $root, 'push', 'origin', 'HEAD')
