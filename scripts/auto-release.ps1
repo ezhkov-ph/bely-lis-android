@@ -8,6 +8,9 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $root = Split-Path -Parent $PSScriptRoot
+$env:GIT_CONFIG_COUNT = '1'
+$env:GIT_CONFIG_KEY_0 = 'safe.directory'
+$env:GIT_CONFIG_VALUE_0 = $root.Replace('\', '/')
 $config = Get-Content -LiteralPath (Join-Path $root 'config\automation.json') -Raw | ConvertFrom-Json
 $automation = Join-Path $root 'artifacts\automation'
 New-Item -ItemType Directory -Force -Path $automation | Out-Null
@@ -107,10 +110,27 @@ try {
         }
 
         Write-Status 'running' 'source' "Preparing Firefox Android $($candidate.version)"
+        $cache = Join-Path $root 'work\upstream-cache.git'
+        if (-not (Test-Path -LiteralPath $cache)) {
+            Invoke-Checked 'git' @('init', '--bare', $cache)
+            Invoke-Checked 'git' @('-C', $cache, 'remote', 'add', 'origin', $candidate.repository)
+        }
+        $cacheRemote = & git -C $cache remote get-url origin
+        if ($LASTEXITCODE -ne 0 -or $cacheRemote -ne $candidate.repository) {
+            throw 'Unexpected upstream cache remote'
+        }
+        Invoke-Checked 'git' @(
+            '-C', $cache, 'fetch', '--force', '--depth', '1', 'origin',
+            "refs/tags/$($candidate.tag):refs/tags/$($candidate.tag)"
+        )
+        $bundle = Join-Path $automation 'upstream.bundle'
+        Remove-Item -LiteralPath $bundle -Force -ErrorAction SilentlyContinue
+        Invoke-Checked 'git' @('-C', $cache, 'bundle', 'create', $bundle, "refs/tags/$($candidate.tag)")
         Invoke-Checked $wsl @(
             '-d', $distro, '--user', 'root', '--exec', 'bash',
             "$wslProject/scripts/build-session.sh", 'update-source',
-            $candidate.version, $candidate.revision, $candidate.tag
+            $candidate.version, $candidate.revision, $candidate.tag,
+            "$wslProject/artifacts/automation/upstream.bundle"
         )
         Invoke-Checked $wsl @(
             '-d', $distro, '--exec', 'python3',

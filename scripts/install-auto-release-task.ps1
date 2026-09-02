@@ -2,6 +2,9 @@ param([switch]$Remove)
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
+$env:GIT_CONFIG_COUNT = '1'
+$env:GIT_CONFIG_KEY_0 = 'safe.directory'
+$env:GIT_CONFIG_VALUE_0 = $root.Replace('\', '/')
 $config = Get-Content -LiteralPath (Join-Path $root 'config\automation.json') -Raw | ConvertFrom-Json
 $taskName = $config.taskName
 
