@@ -1,4 +1,4 @@
-param(
+﻿param(
     [switch]$CheckOnly,
     [switch]$Force,
     [switch]$NoPublish,

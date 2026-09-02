@@ -1,4 +1,4 @@
-param([switch]$Remove)
+﻿param([switch]$Remove)
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
