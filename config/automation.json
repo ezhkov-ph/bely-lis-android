@@ -1,5 +1,5 @@
 {
-  "enabled": false,
+  "enabled": true,
   "wslDistribution": "Ubuntu",
   "autoPublish": true,
   "releaseTagSuffix": "belylis.1",

@@ -123,7 +123,7 @@ powershell -ExecutionPolicy Bypass -File '.\scripts\watch-release.ps1'
 
 [`scripts/auto-release.ps1`](scripts/auto-release.ps1) проверяет официальный стабильный выпуск Firefox Android, переносит проверяемые изменения, собирает и подписывает APK. GitHub Release создаётся только после успешной проверки. Если структура Firefox изменилась несовместимо, публикация отменяется, а предыдущий релиз остаётся доступным.
 
-Автоматизация изначально выключена в [`config/automation.json`](config/automation.json). Перед включением нужны настроенный GitHub remote, `gh auth login`, резервная копия ключа подписи и успешный ручной выпуск.
+Настройки автоматизации находятся в [`config/automation.json`](config/automation.json). Для работы нужны настроенный GitHub remote, `gh auth login`, резервная копия ключа подписи и успешный ручной выпуск.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File '.\scripts\install-auto-release-task.ps1'
