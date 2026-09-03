@@ -1,14 +1,14 @@
 {
-  "revision": "9cd094dbc3eac5df87a24e7a871e52880cb8cd42",
+  "revision": "d065a04bc5610f496762935dee56604a78b91b51",
   "files": {
     "security/nss/lib/ckfw/builtins/certdata.txt": "81b7f2576333a2e360e673f912d7b0b7a765d836c731003e348a46cac5d37198",
     "security/nss/lib/ckfw/builtins/certdata.perl": "cc964e693755833ba7e25554afb17d455774175042f68b7b15e2afb16d2d842a",
-    "mobile/android/fenix/app/build.gradle": "5cd9e5d0adf6ba31e8db55cf9e39739ab035ad0fcf36c522eb61b88b9a3d192b",
-    "mobile/android/fenix/app/src/main/AndroidManifest.xml": "b4fd3ac8afc220c56646b5cd76c7bcccf2e58bafab59fc18ab609bc4645a561c",
-    "mobile/android/fenix/app/src/main/res/values/strings.xml": "c4443ea029a750c712c45ab82bf4743de6b708561f9e77f2e3313d6a10043b65",
-    "mobile/android/fenix/app/src/main/res/values/static_strings.xml": "45ecb17fbacba5b60c119b3cbca5d155e6c0df64edd6bc25d004c2f9a4e09fd5",
+    "mobile/android/fenix/app/build.gradle": "f2c0c69d24cb91b5736d6899b1683e3613d677b272938c15d3e25e665f62afb3",
+    "mobile/android/fenix/app/src/main/AndroidManifest.xml": "9dabfe9201241ee003ffa332e1fdc2a3ad4501109e72dc12afb47a14d0bf7c39",
+    "mobile/android/fenix/app/src/main/res/values/strings.xml": "dd235f65229616360514ad837c196dbb550a43e23be35cc1615a5e577e92d7cb",
+    "mobile/android/fenix/app/src/main/res/values/static_strings.xml": "f5a3e969f36f7039eaf9de59de3ac52c75504cc77c0300b02cc4c3c4fbfd1bdc",
     "mobile/android/config/mozconfigs/common": "0d04eed533ee2151d49f351636c11878719fe82fbfdaa2db06d22863dc488faf",
     "mobile/android/config/mozconfigs/android-aarch64/nightly": "c8879e18cb86716e0e8939d91c065fb1b324c5f04ce609ee4b0311bf35b3cf46",
-    "browser/config/version.txt": "c15af86ff2a610f7c3593faaff810dcebe07dd3b9fa51980f3afa65eb337f123"
+    "browser/config/version.txt": "0264b8db65c2d5c238b98f1f7d6b86af72beda2e9985e26fea3d3adba9328042"
   }
 }
