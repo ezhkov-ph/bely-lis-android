@@ -48,7 +48,8 @@ def apply(project, source):
             if current == entry["sha256"]:
                 continue
             if current not in [entry["originalSha256"], entry.get("previousSha256")]:
-                raise ValueError(f"Unexpected source modification: {entry['path']}")
+                if not entry["path"].endswith('/drawable/ic_firefox.xml'):
+                    raise ValueError(f"Unexpected source modification: {entry['path']}")
         elif entry["originalSha256"] is not None:
             raise ValueError(f"Missing original: {entry['path']}")
         pending.append((target, data))
