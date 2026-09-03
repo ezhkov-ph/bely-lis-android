@@ -46,5 +46,6 @@ test "$(git -C "$source" rev-parse "refs/tags/$tag^{commit}")" = "$revision"
 git -C "$source" reset --hard
 git -C "$source" clean -fd
 git -C "$source" checkout --force --detach "$revision"
+rm -rf "$source/obj-ru-arm64"
 test "$(git -C "$source" rev-parse HEAD)" = "$revision"
 printf 'Source ready: Firefox Android %s at %s\n' "$version" "$revision"
