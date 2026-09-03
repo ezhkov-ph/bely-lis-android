@@ -75,6 +75,8 @@ for (const density of ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']) {
   );
 }
 const sharedLogoPath = 'mobile/android/fenix/app/src/main/res/drawable/ic_firefox.xml';
+const sharedLogoSource = await readFile(resolve(root, 'work/upstream', sharedLogoPath));
+sourcePins.files[sharedLogoPath] = sha256(sharedLogoSource);
 outputs.set(sharedLogoPath, `<?xml version="1.0" encoding="utf-8"?>
 <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
     android:src="@mipmap/white_fox_launcher"
