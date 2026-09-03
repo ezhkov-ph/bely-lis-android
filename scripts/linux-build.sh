@@ -39,7 +39,7 @@ case "${1:-}" in
       cp -a "$source_dir" "$native_source"
     fi
     test "$(git -C "$native_source" rev-parse HEAD)" = "$revision"
-    python3 "$project/scripts/apply-overlay.py" "$project" "$native_source"
+    python3 "$project/scripts/apply-overlay.py" "$project" "$native_source" --allow-existing
     echo 'Source and overlay ready on ext4.'
     ;;
   bootstrap)

@@ -19,7 +19,7 @@ def confined(root, relative):
     return target
 
 
-def apply(project, source):
+def apply(project, source, allow_existing=False):
     project, source = project.resolve(), source.resolve()
     manifest = json.loads((project / "artifacts/overlay-manifest.json").read_text())
     upstream = json.loads((project / "config/upstream.json").read_text())
@@ -36,6 +36,8 @@ def apply(project, source):
         if entry.get("delete"):
             if not target.exists():
                 continue
+            if not allow_existing and digest(target.read_bytes()) not in [entry.get("originalSha256"), entry.get("previousSha256")]:
+                raise ValueError(f"Unexpected source modification: {entry['path']}")
             removals.append(target)
             continue
         data = confined(overlay, entry["path"]).read_bytes()
@@ -45,7 +47,8 @@ def apply(project, source):
             current = digest(target.read_bytes())
             if current == entry["sha256"]:
                 continue
-            # Reapplying a reviewed manifest is intentional during incremental builds.
+            if not allow_existing:
+                raise ValueError(f"Unexpected source modification: {entry['path']}")
         elif entry["originalSha256"] is not None:
             raise ValueError(f"Missing original: {entry['path']}")
         pending.append((target, data))
@@ -65,5 +68,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("project", type=Path)
     parser.add_argument("source", type=Path)
+    parser.add_argument("--allow-existing", action="store_true")
     args = parser.parse_args()
-    apply(args.project, args.source)
+    apply(args.project, args.source, args.allow_existing)

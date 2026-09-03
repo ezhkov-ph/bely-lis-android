@@ -20,7 +20,7 @@ fi
 if [ "${1:-}" = "validate-and-release" ]; then
   runuser -u alex -- python3 "$project/scripts/validate-branding.py"
   runuser -u alex -- python3 -m unittest discover -s "$project/test" -p 'test_*.py'
-  runuser -u alex -- python3 "$project/scripts/apply-overlay.py" "$project" "$mount_dir/firefox-source"
+  runuser -u alex -- python3 "$project/scripts/apply-overlay.py" "$project" "$mount_dir/firefox-source" --allow-existing
   exec runuser -u alex -- bash "$project/scripts/run-build.sh" release-applied
 fi
 exec runuser -u alex -- bash "$project/scripts/run-build.sh" "${1:-pipeline}"
