@@ -17,4 +17,9 @@ if [ "${1:-}" = "update-source-pin" ]; then
   runuser -u alex -- bash "$project/scripts/update-source.sh" "$version" "$revision" "$tag" "$bundle"
   exec runuser -u alex -- python3 "$project/scripts/pin-upstream.py" "$project" "$mount_dir/firefox-source" "$candidate"
 fi
+if [ "${1:-}" = "validate-and-release" ]; then
+  runuser -u alex -- python3 "$project/scripts/validate-branding.py"
+  runuser -u alex -- python3 -m unittest discover -s "$project/test" -p 'test_*.py'
+  exec runuser -u alex -- bash "$project/scripts/run-build.sh" release
+fi
 exec runuser -u alex -- bash "$project/scripts/run-build.sh" "${1:-pipeline}"

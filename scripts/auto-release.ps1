@@ -137,19 +137,10 @@ try {
         Invoke-Checked 'node' @((Join-Path $root 'scripts\fetch-inputs.mjs'))
         Invoke-Checked 'npm' @('test')
         Invoke-Checked 'node' @((Join-Path $root 'scripts\prepare-overlay.mjs'))
-        Invoke-Checked $wsl @(
-            '-d', $distro, '--exec', 'python3',
-            "$wslProject/scripts/validate-branding.py"
-        )
-        Invoke-Checked $wsl @(
-            '-d', $distro, '--exec', 'python3', '-m', 'unittest',
-            'discover', '-s', "$wslProject/test", '-p', 'test_*.py'
-        )
-
         Write-Status 'running' 'build' "Building Firefox Android $($candidate.version)"
         Invoke-Checked $wsl @(
             '-d', $distro, '--user', 'root', '--exec', 'bash',
-            "$wslProject/scripts/build-session.sh", 'release'
+            "$wslProject/scripts/build-session.sh", 'validate-and-release'
         )
     }
 
