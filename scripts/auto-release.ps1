@@ -16,6 +16,7 @@ $automation = Join-Path $root 'artifacts\automation'
 New-Item -ItemType Directory -Force -Path $automation | Out-Null
 $statusPath = Join-Path $automation 'status.json'
 $candidatePath = Join-Path $automation 'candidate.json'
+$runLog = Join-Path $automation 'last-run.log'
 $distro = $config.wslDistribution
 $wslProject = '/mnt/c/Users/alex/Downloads/Firefox ru'
 $wsl = Join-Path $env:SystemRoot 'System32\wsl.exe'
@@ -30,6 +31,7 @@ if (-not (Test-Path -LiteralPath $gh)) {
 $mutex = [Threading.Mutex]::new($false, 'Local\WhiteFoxAutoRelease')
 $locked = $false
 $backup = $null
+$transcriptStarted = $false
 
 function Write-Status {
     param([string]$State, [string]$Stage, [string]$Message)
@@ -43,6 +45,7 @@ function Write-Status {
 
 function Invoke-Checked {
     param([string]$File, [string[]]$Arguments)
+    Write-Host ("> {0} {1}" -f $File, ($Arguments -join ' '))
     & $File @Arguments
     if ($LASTEXITCODE -ne 0) {
         throw ("Command failed with exit code {0}: {1}" -f $LASTEXITCODE, $File)
@@ -50,6 +53,9 @@ function Invoke-Checked {
 }
 
 try {
+    Remove-Item -LiteralPath $runLog -Force -ErrorAction SilentlyContinue
+    Start-Transcript -LiteralPath $runLog -Force | Out-Null
+    $transcriptStarted = $true
     $locked = $mutex.WaitOne(0)
     if (-not $locked) {
         throw 'Another White Fox release check is already running'
@@ -111,22 +117,10 @@ try {
         }
 
         Write-Status 'running' 'source' "Preparing Firefox Android $($candidate.version)"
-        $cache = Join-Path $root 'work\upstream-cache.git'
-        if (-not (Test-Path -LiteralPath $cache)) {
-            Invoke-Checked 'git' @('init', '--bare', $cache)
-            Invoke-Checked 'git' @('-C', $cache, 'remote', 'add', 'origin', $candidate.repository)
-        }
-        $cacheRemote = & git -C $cache remote get-url origin
-        if ($LASTEXITCODE -ne 0 -or $cacheRemote -ne $candidate.repository) {
-            throw 'Unexpected upstream cache remote'
-        }
-        Invoke-Checked 'git' @(
-            '-C', $cache, 'fetch', '--force', '--depth', '1', 'origin',
-            "refs/tags/$($candidate.tag):refs/tags/$($candidate.tag)"
-        )
-        $bundle = Join-Path $automation 'upstream.bundle'
-        Remove-Item -LiteralPath $bundle -Force -ErrorAction SilentlyContinue
-        Invoke-Checked 'git' @('-C', $cache, 'bundle', 'create', $bundle, "refs/tags/$($candidate.tag)")
+        # update-source.sh falls back to the official Mozilla remote when this
+        # optional bundle is absent.  A one-commit shallow bundle is not a
+        # complete clone and previously made the scheduled update unreliable.
+        $bundle = "$wslProject/artifacts/automation/no-upstream.bundle"
         Invoke-Checked $wsl @(
             '-d', $distro, '--user', 'root', '--exec', 'bash',
             "$wslProject/scripts/build-session.sh", 'update-source-pin',
@@ -199,6 +193,9 @@ try {
 } finally {
     if ($locked) {
         $mutex.ReleaseMutex()
+    }
+    if ($transcriptStarted) {
+        Stop-Transcript | Out-Null
     }
     $mutex.Dispose()
 }
