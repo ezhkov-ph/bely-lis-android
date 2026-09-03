@@ -49,7 +49,7 @@ def apply(project, source, allow_existing=False):
                 continue
             if not allow_existing:
                 raise ValueError(f"Unexpected source modification: {entry['path']}")
-        elif entry["originalSha256"] is not None:
+        elif entry["originalSha256"] is not None and not allow_existing:
             raise ValueError(f"Missing original: {entry['path']}")
         pending.append((target, data))
     for target, data in pending:
