@@ -99,9 +99,11 @@ manifestFiles.push({
   previousSha256: 'f8932c28b3a35ffb5606f1324591e92ac6a25ec958eb9d8ebdb9f5c8403eb894',
   delete: true,
 });
+const onboardingSourcePath = 'mobile/android/fenix/app/src/main/res/drawable/ic_onboarding_welcome.xml';
+const onboardingSource = await readFile(resolve(root, 'work/upstream', onboardingSourcePath));
 manifestFiles.push({
-  path: 'mobile/android/fenix/app/src/main/res/drawable/ic_onboarding_welcome.xml',
-  originalSha256: sourcePins.files['mobile/android/fenix/app/src/main/res/drawable/ic_onboarding_welcome.xml'],
+  path: onboardingSourcePath,
+  originalSha256: sha256(onboardingSource),
   delete: true,
 });
 await writeFile(resolve(root, 'artifacts/overlay-manifest.json'), JSON.stringify({ upstream, status: 'text-branding-prepared; APK requires rebuild', files: manifestFiles }, null, 2) + '\n');
