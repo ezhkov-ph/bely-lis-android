@@ -154,10 +154,6 @@ try {
             Invoke-Checked 'git' @('-C', $root, 'push', 'origin', 'HEAD')
         }
         $tag = "v$version-$($config.releaseTagSuffix)"
-        & $gh release view $tag *> $null
-        if ($LASTEXITCODE -eq 0) {
-            throw "GitHub release already exists: $tag"
-        }
         $notes = Join-Path $automation "release-$version.md"
         @(
             "# Белый лис $version"
@@ -168,6 +164,17 @@ try {
             ""
             "APK предназначен для ARM64. Перед установкой сверьте SHA-256."
         ) | Set-Content -LiteralPath $notes -Encoding utf8
+        # gh writes "release not found" to stderr for the normal new-release
+        # case.  PowerShell's Stop preference turns that diagnostic into an
+        # exception before `release create` can run, so isolate this probe.
+        $savedErrorActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        & $gh release view $tag *> $null
+        $releaseExists = ($LASTEXITCODE -eq 0)
+        $ErrorActionPreference = $savedErrorActionPreference
+        if ($releaseExists) {
+            throw "GitHub release already exists: $tag"
+        }
         Invoke-Checked $gh @(
             'release', 'create', $tag,
             $apk,
