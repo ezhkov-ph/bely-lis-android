@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 project='/mnt/c/Users/alex/Downloads/Firefox ru'
+mount_dir='/mnt/ru-browser-build'
 bash "$project/scripts/setup-build-host.sh" disk
 if [ "${1:-}" = "update-source" ]; then
   shift
