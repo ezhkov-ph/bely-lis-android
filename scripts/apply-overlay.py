@@ -47,7 +47,7 @@ def apply(project, source, allow_existing=False):
             current = digest(target.read_bytes())
             if current == entry["sha256"]:
                 continue
-            if not allow_existing:
+            if not allow_existing and current not in [entry["originalSha256"], entry.get("previousSha256")]:
                 raise ValueError(f"Unexpected source modification: {entry['path']}")
         elif entry["originalSha256"] is not None and not allow_existing:
             raise ValueError(f"Missing original: {entry['path']}")
