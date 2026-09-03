@@ -35,7 +35,10 @@ fi
 test "$(git -C "$source" remote get-url origin)" = "$repository"
 if [ -n "$bundle" ]; then
   test -f "$bundle"
-  git -C "$source" fetch --force "$bundle" "refs/tags/$tag:refs/tags/$tag"
+  if ! git -C "$source" fetch --force "$bundle" "refs/tags/$tag:refs/tags/$tag"; then
+    printf 'Bundle is incomplete; fetching the release tag from origin.\n' >&2
+    git -C "$source" fetch --force --depth 1 origin "refs/tags/$tag:refs/tags/$tag"
+  fi
 else
   git -C "$source" fetch --force --depth 1 origin "refs/tags/$tag:refs/tags/$tag"
 fi
