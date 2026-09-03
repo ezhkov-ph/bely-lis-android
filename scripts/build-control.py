@@ -25,6 +25,11 @@ def environment():
         env[name] = str(DISK / folder)
         (DISK / folder).mkdir(exist_ok=True)
     env['PATH'] = str(DISK / 'mozbuild/rustc/bin') + ':' + str(DISK / 'cargo/bin') + ':' + env['PATH']
+    # Gradle's mozconfig reader honors these inherited variables before the
+    # mozconfig file.  They may survive an older build in the WSL session, so
+    # bind them explicitly to the current pinned checkout.
+    env['MOZ_OBJDIR'] = str(SOURCE / 'obj-ru-arm64')
+    env['OBJDIR'] = env['MOZ_OBJDIR']
     env.pop('MOZ_TELEMETRY_REPORTING', None)
     env['MACH_TELEMETRY_NO_SUBMIT'] = '1'
     env['PYTHONUNBUFFERED'] = '1'
