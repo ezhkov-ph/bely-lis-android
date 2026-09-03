@@ -5,6 +5,7 @@ version="${1:?version is required}"
 revision="${2:?revision is required}"
 tag="${3:?tag is required}"
 bundle="${4:-}"
+project='/mnt/c/Users/alex/Downloads/Firefox ru'
 disk='/mnt/ru-browser-build'
 source="$disk/firefox-source"
 repository='https://github.com/mozilla-firefox/firefox.git'
@@ -19,6 +20,18 @@ if [ ! -e "$source" ]; then
   mv "$legacy" "$source"
 fi
 test -d "$source/.git"
+origin=$(git -C "$source" remote get-url origin)
+if [ "$origin" != "$repository" ]; then
+  case "$origin" in
+    "$project"/work/linux-build/firefox-*)
+      git -C "$source" remote set-url origin "$repository"
+      ;;
+    *)
+      printf 'Unexpected source origin: %s\n' "$origin" >&2
+      exit 1
+      ;;
+  esac
+fi
 test "$(git -C "$source" remote get-url origin)" = "$repository"
 if [ -n "$bundle" ]; then
   test -f "$bundle"
