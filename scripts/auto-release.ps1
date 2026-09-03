@@ -129,14 +129,9 @@ try {
         Invoke-Checked 'git' @('-C', $cache, 'bundle', 'create', $bundle, "refs/tags/$($candidate.tag)")
         Invoke-Checked $wsl @(
             '-d', $distro, '--user', 'root', '--exec', 'bash',
-            "$wslProject/scripts/build-session.sh", 'update-source',
+            "$wslProject/scripts/build-session.sh", 'update-source-pin',
             $candidate.version, $candidate.revision, $candidate.tag,
-            "$wslProject/artifacts/automation/upstream.bundle"
-        )
-        Invoke-Checked $wsl @(
-            '-d', $distro, '--exec', 'python3',
-            "$wslProject/scripts/pin-upstream.py", $wslProject,
-            '/mnt/ru-browser-build/firefox-source',
+            "$wslProject/artifacts/automation/upstream.bundle",
             "$wslProject/artifacts/automation/candidate.json"
         )
         Invoke-Checked 'node' @((Join-Path $root 'scripts\fetch-inputs.mjs'))
