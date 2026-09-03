@@ -55,7 +55,7 @@ def logged(command, name, env, cwd=SOURCE):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('stage', choices=['inspect', 'inspect-branding', 'export-branding', 'verify-branding', 'release', 'release-ui', 'apply', 'bootstrap', 'retry-bootstrap', 'android-help', 'android-build', 'rust-build', 'build', 'pipeline', 'collect', 'network', 'logs'])
+    parser.add_argument('stage', choices=['inspect', 'inspect-branding', 'export-branding', 'verify-branding', 'release', 'release-ui', 'release-applied', 'apply', 'bootstrap', 'retry-bootstrap', 'android-help', 'android-build', 'rust-build', 'build', 'pipeline', 'collect', 'network', 'logs'])
     args = parser.parse_args()
     if args.stage == 'network':
         for url in ['https://dl.google.com/android/repository/repository2-1.xml', 'https://firefox-ci-tc.services.mozilla.com/api/queue/v1/ping']:
@@ -150,12 +150,13 @@ def main():
                         print('\n'.join(lines[max(0, i-2):i+10]))
         return
     env = environment()
-    if args.stage in ('release', 'release-ui'):
+    if args.stage in ('release', 'release-ui', 'release-applied'):
         status = PROJECT / 'artifacts/release-build-status.json'
         status.write_text(json.dumps({'status': 'running', 'stage': 'preflight'}), encoding='utf-8')
         try:
             subprocess.run([sys.executable, str(PROJECT / 'scripts/validate-branding.py')], check=True)
-            subprocess.run([sys.executable, str(PROJECT / 'scripts/apply-overlay.py'), str(PROJECT), str(SOURCE)], check=True)
+            if args.stage != 'release-applied':
+                subprocess.run([sys.executable, str(PROJECT / 'scripts/apply-overlay.py'), str(PROJECT), str(SOURCE)], check=True)
             config = PROJECT / 'config/mozconfig.arm64'
             ndks = sorted((DISK / 'mozbuild').glob('android-ndk-*'))
             sdk = DISK / 'mozbuild/android-sdk-linux'
