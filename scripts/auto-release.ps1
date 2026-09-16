@@ -32,6 +32,17 @@ $mutex = [Threading.Mutex]::new($false, 'Local\WhiteFoxAutoRelease')
 $locked = $false
 $backup = $null
 $transcriptStarted = $false
+$awakeRequestActive = $false
+$executionStateContinuous = [Convert]::ToUInt32('80000000', 16)
+$executionStateSystemRequired = [Convert]::ToUInt32('80000001', 16)
+
+Add-Type @'
+using System.Runtime.InteropServices;
+public static class WhiteFoxPowerRequest {
+    [DllImport("kernel32.dll")]
+    public static extern uint SetThreadExecutionState(uint flags);
+}
+'@
 
 function Write-Status {
     param([string]$State, [string]$Stage, [string]$Message)
@@ -56,6 +67,10 @@ try {
     Remove-Item -LiteralPath $runLog -Force -ErrorAction SilentlyContinue
     Start-Transcript -LiteralPath $runLog -Force | Out-Null
     $transcriptStarted = $true
+    # Firefox builds can last for hours.  Keep Windows awake while this task
+    # owns WSL; the display may still turn off normally.
+    [void][WhiteFoxPowerRequest]::SetThreadExecutionState($executionStateSystemRequired)
+    $awakeRequestActive = $true
     $locked = $mutex.WaitOne(0)
     if (-not $locked) {
         throw 'Another White Fox release check is already running'
@@ -203,6 +218,9 @@ try {
     }
     if ($transcriptStarted) {
         Stop-Transcript | Out-Null
+    }
+    if ($awakeRequestActive) {
+        [void][WhiteFoxPowerRequest]::SetThreadExecutionState($executionStateContinuous)
     }
     $mutex.Dispose()
 }
