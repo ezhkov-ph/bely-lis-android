@@ -37,6 +37,23 @@ def environment():
     return env
 
 
+def configure_gradle_memory(env):
+    path = Path(env['GRADLE_USER_HOME']) / 'gradle.properties'
+    settings = {
+        'org.gradle.jvmargs': '-Xmx6g -Xms512m -XX:MaxMetaspaceSize=1536m -XX:+UseG1GC -Dfile.encoding=UTF-8',
+        'org.gradle.workers.max': '1',
+        'org.gradle.parallel': 'false',
+        'org.gradle.tooling.parallel': 'false',
+        'kotlin.compiler.execution.strategy': 'in-process',
+    }
+    existing = path.read_text() if path.exists() else ''
+    lines = [line for line in existing.splitlines()
+             if line.split('=', 1)[0].strip() not in settings]
+    lines.extend(f'{key}={value}' for key, value in settings.items())
+    path.write_text('\n'.join(lines) + '\n')
+    print('Gradle: 6 GiB heap, 1.5 GiB metaspace, one worker, Kotlin in-process', flush=True)
+
+
 def verify_source():
     if not os.path.ismount(DISK):
         raise RuntimeError('Project build disk is not mounted')
@@ -193,6 +210,7 @@ def main():
         return
     env = environment()
     if args.stage in ('release', 'release-ui', 'release-applied'):
+        configure_gradle_memory(env)
         status = PROJECT / 'artifacts/release-build-status.json'
         status.write_text(json.dumps({'status': 'running', 'stage': 'preflight'}), encoding='utf-8')
         try:
@@ -219,8 +237,11 @@ def main():
             if args.stage in ('release', 'release-applied'):
                 status.write_text(json.dumps({'status': 'running', 'stage': 'GeckoView'}), encoding='utf-8')
                 logged(['./mach', 'build'], 'release-geckoview', env)
+            # GeckoView and Fenix can select different daemon JVMs. Release
+            # the completed GeckoView daemon before starting R8 in Fenix.
+            logged(['./mach', 'gradle', '--stop'], 'release-gradle-stop', env)
             status.write_text(json.dumps({'status': 'running', 'stage': 'Fenix release'}), encoding='utf-8')
-            logged(['./mach', 'gradle', 'fenix:assembleRelease', '-PdisableDebugSigning'], 'release-fenix', env)
+            logged(['./mach', 'gradle', 'fenix:assembleRelease', '-PdisableDebugSigning', '--no-daemon', '--max-workers=1', '--no-parallel'], 'release-fenix', env)
             status.write_text(json.dumps({'status': 'running', 'stage': 'sign and verify'}), encoding='utf-8')
             subprocess.run([sys.executable, str(PROJECT / 'scripts/collect-release-apk.py')], check=True, env=env)
             status.write_text(json.dumps({'status': 'complete', 'stage': 'done'}), encoding='utf-8')

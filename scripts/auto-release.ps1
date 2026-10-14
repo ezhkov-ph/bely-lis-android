@@ -244,6 +244,15 @@ try {
     }
     Write-Status 'complete' 'done' "White Fox $version release completed"
 } catch {
+    $buildStatusPath = Join-Path $root 'artifacts\release-build-status.json'
+    if (Test-Path -LiteralPath $buildStatusPath) {
+        $buildStatus = Get-Content -LiteralPath $buildStatusPath -Raw | ConvertFrom-Json
+        if ($buildStatus.status -eq 'running') {
+            $buildStatus.status = 'failed'
+            $buildStatus | Add-Member -NotePropertyName error -NotePropertyValue $_.Exception.Message -Force
+            $buildStatus | ConvertTo-Json | Set-Content -LiteralPath $buildStatusPath -Encoding utf8
+        }
+    }
     if ($backup) {
         foreach ($path in @('README.md', 'config\upstream.json', 'config\source-hashes.json', 'config\branding-source-hashes.json')) {
             $saved = Join-Path $backup $path
