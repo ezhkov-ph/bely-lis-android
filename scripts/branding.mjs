@@ -106,14 +106,15 @@ export async function prepareBranding({ source, pins, branding, russian, outputs
     'getString(R.string.about_whats_new, getString(R.string.upstream_firefox_name))', aboutPath));
 
   const wordmarkPath = java + 'home/ui/Wordmark.kt';
-  let wordmark = await source(wordmarkPath);
-  wordmark = replaceOnce(wordmark, 'import androidx.compose.ui.graphics.ColorFilter\n', '', wordmarkPath);
-  wordmark = replaceOnce(wordmark, 'import androidx.compose.ui.res.dimensionResource\n', '', wordmarkPath);
-  wordmark = replaceOnce(wordmark, 'import androidx.compose.runtime.Composable', 'import androidx.compose.material3.Text\nimport androidx.compose.runtime.Composable', wordmarkPath);
-  wordmark = replaceOnce(wordmark, 'import org.mozilla.fenix.R\n', 'import org.mozilla.fenix.R\nimport org.mozilla.fenix.theme.FirefoxTheme\n', wordmarkPath);
-  const oldText = wordmark.slice(wordmark.indexOf('@Composable\ninternal fun WordmarkText'));
-  if (!oldText.includes('painterResource(getAttr(R.attr.fenixWordmarkText))')) throw new Error('Unexpected wordmark implementation');
-  wordmark = replaceOnce(wordmark, oldText, `@Composable
+  if (pins.files[wordmarkPath]) {
+    let wordmark = await source(wordmarkPath);
+    wordmark = replaceOnce(wordmark, 'import androidx.compose.ui.graphics.ColorFilter\n', '', wordmarkPath);
+    wordmark = replaceOnce(wordmark, 'import androidx.compose.ui.res.dimensionResource\n', '', wordmarkPath);
+    wordmark = replaceOnce(wordmark, 'import androidx.compose.runtime.Composable', 'import androidx.compose.material3.Text\nimport androidx.compose.runtime.Composable', wordmarkPath);
+    wordmark = replaceOnce(wordmark, 'import org.mozilla.fenix.R\n', 'import org.mozilla.fenix.R\nimport org.mozilla.fenix.theme.FirefoxTheme\n', wordmarkPath);
+    const oldText = wordmark.slice(wordmark.indexOf('@Composable\ninternal fun WordmarkText'));
+    if (!oldText.includes('painterResource(getAttr(R.attr.fenixWordmarkText))')) throw new Error('Unexpected wordmark implementation');
+    wordmark = replaceOnce(wordmark, oldText, `@Composable
 internal fun WordmarkText(color: Color?) {
     Text(
         modifier = Modifier.semantics {
@@ -126,7 +127,8 @@ internal fun WordmarkText(color: Color?) {
     )
 }
 `, wordmarkPath);
-  outputs.set(wordmarkPath, wordmark);
+    outputs.set(wordmarkPath, wordmark);
+  }
 
   for (const relative of ['pbmlock/UnlockPrivateTabsScreen.kt', 'settings/biometric/ui/UnlockScreen.kt']) {
     const path = java + relative;
@@ -149,7 +151,9 @@ internal fun WordmarkText(color: Color?) {
   layout = replaceOnce(layout, 'app:srcCompat="?fenixLogo"', 'android:text="@string/app_name"\n            android:textSize="32sp"\n            android:textStyle="bold"\n            android:textColor="?android:attr/textColorPrimary"\n            android:gravity="center"', layoutPath);
   outputs.set(layoutPath, layout);
   changes.push({ path: aboutPath, key: 'Release notes keep referring to upstream Firefox' });
-  for (const path of [wordmarkPath, layoutPath, java + 'pbmlock/UnlockPrivateTabsScreen.kt', java + 'settings/biometric/ui/UnlockScreen.kt']) {
+  const textBrandingPaths = [layoutPath, java + 'pbmlock/UnlockPrivateTabsScreen.kt', java + 'settings/biometric/ui/UnlockScreen.kt'];
+  if (pins.files[wordmarkPath]) textBrandingPaths.unshift(wordmarkPath);
+  for (const path of textBrandingPaths) {
     changes.push({ path, key: 'Image wordmark replaced with accessible app-name text' });
   }
   return { displayName: branding.displayName, status: 'prepared; APK not rebuilt', changes, preserved };
