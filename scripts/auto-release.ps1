@@ -60,12 +60,19 @@ function Invoke-Checked {
     # Redirect native stderr into the transcript as ordinary output.  Without
     # this, PowerShell can stop on a native command's error stream before its
     # diagnostic reaches last-run.log, leaving only an unhelpful exit code.
+    # WSL itself writes an informational localhost-proxy warning to stderr in
+    # NAT mode.  Do not let PowerShell turn that warning into a terminating
+    # error; the process exit code remains the source of truth.
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     $output = @(& $File @Arguments 2>&1)
+    $exitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
     foreach ($line in $output) {
         Write-Host $line
     }
-    if ($LASTEXITCODE -ne 0) {
-        throw ("Command failed with exit code {0}: {1}" -f $LASTEXITCODE, $File)
+    if ($exitCode -ne 0) {
+        throw ("Command failed with exit code {0}: {1}" -f $exitCode, $File)
     }
 }
 
