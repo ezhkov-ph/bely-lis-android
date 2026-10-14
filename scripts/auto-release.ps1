@@ -113,9 +113,26 @@ try {
     if ($publish) {
         Invoke-Checked 'git' @('-C', $root, 'rev-parse', '--is-inside-work-tree')
         if ($config.requireCleanGit) {
-            $changes = & git -C $root status --porcelain
-            if ($LASTEXITCODE -ne 0 -or $changes) {
+            $stateFiles = @('README.md', 'config/upstream.json', 'config/source-hashes.json', 'config/branding-source-hashes.json')
+            $changes = @(& git -C $root status --porcelain)
+            if ($LASTEXITCODE -ne 0) {
                 throw 'Git working tree must be clean before an automatic release'
+            }
+            if ($changes) {
+                $changedPaths = @($changes | ForEach-Object { $_.Substring(3).Trim() })
+                $onlyInterruptedReleaseState = ($changedPaths.Count -gt 0) -and
+                    (@($changedPaths | Where-Object { $_ -notin $stateFiles }).Count -eq 0)
+                if (-not $onlyInterruptedReleaseState) {
+                    throw 'Git working tree must be clean before an automatic release'
+                }
+                $recovery = Join-Path $automation ('interrupted-state-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+                New-Item -ItemType Directory -Force -Path $recovery | Out-Null
+                foreach ($path in $changedPaths) {
+                    $destination = Join-Path $recovery $path
+                    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
+                    Copy-Item -LiteralPath (Join-Path $root $path) -Destination $destination
+                }
+                Invoke-Checked 'git' (@('-C', $root, 'restore', '--source=HEAD', '--') + $changedPaths)
             }
         }
         Invoke-Checked 'git' @('-C', $root, 'remote', 'get-url', 'origin')
@@ -140,7 +157,7 @@ try {
             '-d', $distro, '--user', 'root', '--exec', 'bash',
             "$wslProject/scripts/build-session.sh", 'update-source-pin',
             $candidate.version, $candidate.revision, $candidate.tag,
-            "$wslProject/artifacts/automation/upstream.bundle",
+            $bundle,
             "$wslProject/artifacts/automation/candidate.json"
         )
         Invoke-Checked 'node' @((Join-Path $root 'scripts\fetch-inputs.mjs'))
