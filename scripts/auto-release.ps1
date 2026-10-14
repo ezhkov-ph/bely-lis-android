@@ -96,7 +96,7 @@ try {
     $candidate = Get-Content -LiteralPath $candidatePath -Raw | ConvertFrom-Json
     $current = Get-Content -LiteralPath (Join-Path $root 'config\upstream.json') -Raw | ConvertFrom-Json
     $isNew = $candidate.revision -ne $current.revision
-    $shouldUpdate = $isNew -and -not $PublishCurrent
+    $shouldUpdate = $false
 
     if ($CheckOnly) {
         [ordered]@{
@@ -109,20 +109,8 @@ try {
         Write-Status 'complete' 'check' 'Version check completed'
         return
     }
-    if (-not $isNew -and -not $PublishCurrent) {
-        Write-Status 'complete' 'no-update' "Firefox Android $($current.version) is current"
-        return
-    }
-    if (-not $config.enabled -and -not $Force) {
-        throw 'Automation is disabled in config/automation.json; use -Force for a manual run'
-    }
-    foreach ($path in @('keys\white-fox-release.jks', '.env.signing.json')) {
-        if (-not (Test-Path -LiteralPath (Join-Path $root $path))) {
-            throw "Required local signing file is missing: $path"
-        }
-    }
-
     $publish = $config.autoPublish -and -not $NoPublish
+    $releaseExists = $false
     if ($publish) {
         Invoke-Checked 'git' @('-C', $root, 'rev-parse', '--is-inside-work-tree')
         if ($config.requireCleanGit) {
@@ -150,6 +138,30 @@ try {
         }
         Invoke-Checked 'git' @('-C', $root, 'remote', 'get-url', 'origin')
         Invoke-Checked $gh @('auth', 'status')
+        $tag = "v$($candidate.version)-$($config.releaseTagSuffix)"
+        $savedErrorActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        & $gh release view $tag *> $null
+        $releaseExists = ($LASTEXITCODE -eq 0)
+        $ErrorActionPreference = $savedErrorActionPreference
+    }
+
+    $candidateApk = Join-Path $root "artifacts\apk\bely-lis-$($candidate.version)-arm64-release.apk"
+    # A stopped task may already have pinned the source revision but not have
+    # produced or published its APK. Resume that exact release instead of
+    # reporting it as current solely because the pin was written.
+    $shouldUpdate = -not $PublishCurrent -and ($isNew -or ((-not $releaseExists) -and -not (Test-Path -LiteralPath $candidateApk)))
+    if (-not $shouldUpdate -and -not $PublishCurrent) {
+        Write-Status 'complete' 'no-update' "Firefox Android $($current.version) is current"
+        return
+    }
+    if (-not $config.enabled -and -not $Force) {
+        throw 'Automation is disabled in config/automation.json; use -Force for a manual run'
+    }
+    foreach ($path in @('keys\white-fox-release.jks', '.env.signing.json')) {
+        if (-not (Test-Path -LiteralPath (Join-Path $root $path))) {
+            throw "Required local signing file is missing: $path"
+        }
     }
 
     if ($shouldUpdate) {
