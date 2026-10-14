@@ -40,8 +40,7 @@ if [ "$origin" != "$repository" ]; then
   esac
 fi
 test "$(git -C "$source" remote get-url origin)" = "$repository"
-if [ -n "$bundle" ]; then
-  test -f "$bundle"
+if [ -n "$bundle" ] && [ -f "$bundle" ]; then
   if ! git -C "$source" fetch --force "$bundle" "refs/tags/$tag:refs/tags/$tag"; then
     printf 'Bundle is incomplete; fetching the release tag from origin.\n' >&2
     git -C "$source" fetch --force --depth 1 origin "refs/tags/$tag:refs/tags/$tag"
