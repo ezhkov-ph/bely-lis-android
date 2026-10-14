@@ -65,11 +65,11 @@ function Invoke-Checked {
     # error; the process exit code remains the source of truth.
     $previousErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
-    $output = @(& $File @Arguments 2>&1)
-    $exitCode = $LASTEXITCODE
-    $ErrorActionPreference = $previousErrorActionPreference
-    foreach ($line in $output) {
-        Write-Host $line
+    try {
+        & $File @Arguments 2>&1 | ForEach-Object { Write-Host $_ }
+        $exitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $previousErrorActionPreference
     }
     if ($exitCode -ne 0) {
         throw ("Command failed with exit code {0}: {1}" -f $exitCode, $File)

@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import signal
 import subprocess
@@ -56,6 +57,25 @@ def logged(command, name, env, cwd=SOURCE):
     if result.returncode:
         print('\n'.join((LOGS / (name + '.log')).read_text(errors='replace').splitlines()[-45:]))
         raise SystemExit(result.returncode)
+
+
+def ensure_release_ndk(env):
+    android_script = 'python/mozboot/mozboot/android.py'
+    upstream_script = subprocess.check_output(
+        ['git', 'show', f"{UPSTREAM['revision']}:{android_script}"],
+        cwd=SOURCE, text=True,
+    )
+    versions = re.findall(r'^NDK_VERSION\s*=\s*[\"\x27](r\d+[a-z]?)[\"\x27]\s*$', upstream_script, re.M)
+    if len(versions) != 1:
+        raise RuntimeError('Cannot determine the pinned Firefox Android NDK version')
+    ndk = DISK / 'mozbuild' / f'android-ndk-{versions[0]}'
+    env.pop('ANDROID_NDK_HOME', None)
+    if not (ndk / 'source.properties').is_file() or not (ndk / 'toolchains/llvm/prebuilt/linux-x86_64/bin/clang').is_file():
+        print(f'Installing Firefox-required Android NDK {versions[0]}', flush=True)
+        logged(['./mach', 'python', '--', android_script, '--no-interactive', '--ndk-only'], 'release-ndk', env)
+    if not (ndk / 'source.properties').is_file() or not (ndk / 'toolchains/llvm/prebuilt/linux-x86_64/bin/clang').is_file():
+        raise RuntimeError(f'Android NDK installation is incomplete: {ndk}')
+    return ndk
 
 
 def main():
@@ -163,12 +183,12 @@ def main():
             if args.stage != 'release-applied':
                 subprocess.run([sys.executable, str(PROJECT / 'scripts/apply-overlay.py'), str(PROJECT), str(SOURCE)], check=True)
             config = PROJECT / 'config/mozconfig.arm64'
-            ndks = sorted((DISK / 'mozbuild').glob('android-ndk-*'))
+            status.write_text(json.dumps({'status': 'running', 'stage': 'Android NDK'}), encoding='utf-8')
+            ndk = ensure_release_ndk(env)
             sdk = DISK / 'mozbuild/android-sdk-linux'
             java = sorted((DISK / 'mozbuild/jdk').glob('*/bin/java'))[-1]
             contents = config.read_text()
-            if ndks:
-                contents += f'\nac_add_options --with-android-ndk={ndks[-1]}\n'
+            contents += f'\nac_add_options --with-android-ndk={ndk}\n'
             contents += f'ac_add_options --with-android-sdk={sdk}\n'
             (SOURCE / 'mozconfig').write_text(contents)
             env['ANDROID_HOME'] = str(sdk)
