@@ -57,7 +57,13 @@ function Write-Status {
 function Invoke-Checked {
     param([string]$File, [string[]]$Arguments)
     Write-Host ("> {0} {1}" -f $File, ($Arguments -join ' '))
-    & $File @Arguments
+    # Redirect native stderr into the transcript as ordinary output.  Without
+    # this, PowerShell can stop on a native command's error stream before its
+    # diagnostic reaches last-run.log, leaving only an unhelpful exit code.
+    $output = @(& $File @Arguments 2>&1)
+    foreach ($line in $output) {
+        Write-Host $line
+    }
     if ($LASTEXITCODE -ne 0) {
         throw ("Command failed with exit code {0}: {1}" -f $LASTEXITCODE, $File)
     }
