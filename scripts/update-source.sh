@@ -49,9 +49,14 @@ else
   git -C "$source" fetch --force --depth 1 origin "refs/tags/$tag:refs/tags/$tag"
 fi
 test "$(git -C "$source" rev-parse "refs/tags/$tag^{commit}")" = "$revision"
+previous_revision=$(git -C "$source" rev-parse HEAD 2>/dev/null || true)
 git -C "$source" reset --hard
 git -C "$source" clean -fd
 git -C "$source" checkout --force --detach "$revision"
-rm -rf "$source/obj-ru-arm64"
+if [ "$previous_revision" != "$revision" ]; then
+  rm -rf "$source/obj-ru-arm64"
+else
+  printf 'Keeping object files for retry of the same verified revision.\n'
+fi
 test "$(git -C "$source" rev-parse HEAD)" = "$revision"
 printf 'Source ready: Firefox Android %s at %s\n' "$version" "$revision"
