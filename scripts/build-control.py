@@ -78,6 +78,23 @@ def ensure_release_ndk(env):
     return ndk
 
 
+def ensure_release_android(env):
+    marker = DISK / 'mozbuild' / 'white-fox-android-bootstrap.json'
+    try:
+        prepared = json.loads(marker.read_text())
+    except (FileNotFoundError, json.JSONDecodeError):
+        prepared = {}
+    if prepared.get('revision') != UPSTREAM['revision']:
+        # Run the pinned release's complete Android setup: SDK command-line
+        # tools, required SDK packages, JDK, bundletool and NDK change together.
+        # Record success only after the official installer has completed.
+        env.pop('ANDROID_NDK_HOME', None)
+        env.pop('ANDROID_SDK_HOME', None)
+        logged(['./mach', 'python', '--', 'python/mozboot/mozboot/android.py', '--no-interactive'], 'release-android-tools', env)
+        marker.write_text(json.dumps({'revision': UPSTREAM['revision']}))
+    return ensure_release_ndk(env)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('stage', choices=['inspect', 'inspect-branding', 'export-branding', 'verify-branding', 'release', 'release-ui', 'release-applied', 'apply', 'bootstrap', 'retry-bootstrap', 'android-help', 'android-build', 'rust-build', 'build', 'pipeline', 'collect', 'network', 'logs'])
@@ -183,8 +200,8 @@ def main():
             if args.stage != 'release-applied':
                 subprocess.run([sys.executable, str(PROJECT / 'scripts/apply-overlay.py'), str(PROJECT), str(SOURCE)], check=True)
             config = PROJECT / 'config/mozconfig.arm64'
-            status.write_text(json.dumps({'status': 'running', 'stage': 'Android NDK'}), encoding='utf-8')
-            ndk = ensure_release_ndk(env)
+            status.write_text(json.dumps({'status': 'running', 'stage': 'Android SDK/NDK'}), encoding='utf-8')
+            ndk = ensure_release_android(env)
             sdk = DISK / 'mozbuild/android-sdk-linux'
             java = sorted((DISK / 'mozbuild/jdk').glob('*/bin/java'))[-1]
             contents = config.read_text()
