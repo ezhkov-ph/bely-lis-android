@@ -16,8 +16,15 @@ if [ ! -e "$source" ]; then
   if [ ! -e "$legacy" ]; then
     legacy=$(find "$disk" -maxdepth 1 -type d -name 'firefox-*' -print -quit)
   fi
-  test -n "${legacy:-}" && test -d "$legacy/.git"
-  mv "$legacy" "$source"
+  if [ -n "${legacy:-}" ] && [ -d "$legacy/.git" ]; then
+    mv "$legacy" "$source"
+  else
+    # The build disk can be recreated or cleaned independently of the Windows
+    # workspace.  Bootstrap an empty checkout so the normal fetch below can
+    # recover the pinned release instead of failing with no diagnostic.
+    git init "$source"
+    git -C "$source" remote add origin "$repository"
+  fi
 fi
 test -d "$source/.git"
 origin=$(git -C "$source" remote get-url origin)
