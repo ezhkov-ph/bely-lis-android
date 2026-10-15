@@ -63,6 +63,17 @@ def verify_source():
         raise RuntimeError('Wrong source revision')
 
 
+def repair_incomplete_ipdl():
+    ipdl = SOURCE / 'obj-ru-arm64/ipc/ipdl'
+    message_start = ipdl / '_ipdlheaders/IPCMessageStart.h'
+    if message_start.exists() and message_start.stat().st_size == 0:
+        # A terminated build can leave empty generated outputs with a valid
+        # dependency timestamp. Force the IPC generator to produce them again.
+        for name in ('ipdl.track', 'ipdl_lextab.py', 'ipdl_yacctab.py'):
+            (ipdl / name).unlink(missing_ok=True)
+        print('Empty IPCMessageStart.h: invalidated IPC generation stamp', flush=True)
+
+
 def logged(command, name, env, cwd=SOURCE):
     LOGS.mkdir(parents=True, exist_ok=True)
     if (LOGS / (name + '.log')).exists():
@@ -236,6 +247,7 @@ def main():
             # before the Fenix Gradle target is a valid mach command.
             if args.stage in ('release', 'release-applied'):
                 status.write_text(json.dumps({'status': 'running', 'stage': 'GeckoView'}), encoding='utf-8')
+                repair_incomplete_ipdl()
                 logged(['./mach', 'build'], 'release-geckoview', env)
             # GeckoView and Fenix can select different daemon JVMs. Release
             # the completed GeckoView daemon before starting R8 in Fenix.

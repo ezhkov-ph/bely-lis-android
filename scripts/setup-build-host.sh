@@ -19,6 +19,16 @@ case "${1:-}" in
     mkdir -p "$mount_dir"
     if ! mountpoint -q "$mount_dir"; then
       test -z "$(ls -A "$mount_dir")" || { echo 'Mount directory is not empty'; exit 1; }
+      filesystem_state=$(LC_ALL=C tune2fs -l "$image" | sed -n 's/^Filesystem state:[[:space:]]*//p')
+      if [ "$filesystem_state" != "clean" ]; then
+        printf 'Checking build filesystem (%s) before mounting.\n' "$filesystem_state"
+        result=0
+        e2fsck -p "$image" || result=$?
+        if [ "$result" -gt 1 ]; then
+          printf 'Build filesystem needs manual repair (e2fsck exit %s).\n' "$result" >&2
+          exit "$result"
+        fi
+      fi
       mount -o loop "$image" "$mount_dir"
     fi
     loop_device=$(findmnt -n -o SOURCE --target "$mount_dir")
