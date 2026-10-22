@@ -1,9 +1,9 @@
 {
   "repository": "https://github.com/mozilla-firefox/firefox.git",
-  "revision": "9378fbc58660847fbc02c3486a0ecd6049978e25",
-  "tag": "FIREFOX-ANDROID_158_0_1_RELEASE",
-  "version": "158.0.1",
-  "verifiedOn": "2026-10-21",
+  "revision": "08d23041955657e661eef22c8fdc967735300233",
+  "tag": "FIREFOX-ANDROID_158_0_2_RELEASE",
+  "version": "158.0.2",
+  "verifiedOn": "2026-10-22",
   "channel": "release",
   "sourceFiles": [
     "security/nss/lib/ckfw/builtins/certdata.txt",

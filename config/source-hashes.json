@@ -1,5 +1,5 @@
 {
-  "revision": "9378fbc58660847fbc02c3486a0ecd6049978e25",
+  "revision": "08d23041955657e661eef22c8fdc967735300233",
   "files": {
     "security/nss/lib/ckfw/builtins/certdata.txt": "beb7e6dfe6499926e52c075c27bcfbe4c957f8609c575b3860273ae2806f63eb",
     "security/nss/lib/ckfw/builtins/certdata.perl": "cc964e693755833ba7e25554afb17d455774175042f68b7b15e2afb16d2d842a",
@@ -9,6 +9,6 @@
     "mobile/android/fenix/app/src/main/res/values/static_strings.xml": "57f072d29140de06eb953400d980a80d49e2add37b398c553819a734a86ee0d0",
     "mobile/android/config/mozconfigs/common": "a3c6e1e5eaea4d77f3e6a6b3545618df76d218edcf05deadfcd9bbd8a1a643ae",
     "mobile/android/config/mozconfigs/android-aarch64/nightly": "c8879e18cb86716e0e8939d91c065fb1b324c5f04ce609ee4b0311bf35b3cf46",
-    "browser/config/version.txt": "6028912efec32cd8cb807684f820c9f5ad6f2adccf432dc057a780536bc91b7b"
+    "browser/config/version.txt": "f2dec3befed3851448349d6c726b461a745bcb3642b198b46d032ebd1f377f14"
   }
 }
