@@ -3,6 +3,11 @@ set -euo pipefail
 project='/mnt/c/Users/alex/Downloads/Firefox ru'
 mount_dir='/mnt/ru-browser-build'
 bash "$project/scripts/setup-build-host.sh" disk
+exec 9>"$mount_dir/white-fox-build.lock"
+if ! flock -n 9; then
+  printf 'Another White Fox source or build session is still running.\n' >&2
+  exit 75
+fi
 if [ "${1:-}" = "update-source" ]; then
   shift
   exec runuser -u alex -- bash "$project/scripts/update-source.sh" "$@"
