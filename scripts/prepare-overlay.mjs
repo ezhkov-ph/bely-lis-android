@@ -63,6 +63,10 @@ for (const density of ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']) {
   const data = await readFile(resolve(root, asset));
   if (sha256(data) !== logoAssets.files[asset]) throw new Error(`Logo asset hash mismatch: ${asset}`);
   outputs.set(`mobile/android/fenix/app/src/main/res/mipmap-${density}/white_fox_launcher.png`, data);
+  // Compose painterResource can load raster files directly, but not Android's
+  // generic <bitmap> XML drawable.  Keep ic_firefox as a real density-aware
+  // PNG because upstream uses it from both Views and Compose screens.
+  outputs.set(`mobile/android/fenix/app/src/main/res/drawable-${density}/ic_firefox.png`, data);
 
   const onboardingAsset = `branding/generated/white-fox-onboarding-${density}.png`;
   const onboardingData = await readFile(resolve(root, onboardingAsset));
@@ -77,13 +81,6 @@ for (const density of ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']) {
 const sharedLogoPath = 'mobile/android/fenix/app/src/main/res/drawable/ic_firefox.xml';
 const sharedLogoSource = await readFile(resolve(root, 'work/upstream', sharedLogoPath));
 sourcePins.files[sharedLogoPath] = sha256(sharedLogoSource);
-outputs.set(sharedLogoPath, `<?xml version="1.0" encoding="utf-8"?>
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@mipmap/white_fox_launcher"
-    android:gravity="center"
-    android:filter="true"
-    android:antialias="true" />
-`);
 const brandingReport = await prepareBranding({ source, pins: brandingPins, branding, russian, outputs });
 const manifestFiles = [];
 for (const [path, content] of outputs) {
@@ -95,6 +92,12 @@ for (const [path, content] of outputs) {
   if (path === 'mobile/android/fenix/app/src/main/res/values/ru_browser.xml') entry.previousSha256 = branding.previousTestNameSha256;
   manifestFiles.push(entry);
 }
+manifestFiles.push({
+  path: sharedLogoPath,
+  originalSha256: sha256(sharedLogoSource),
+  previousSha256: 'de7a197683182fb8154726fb16924c83485cdf9cb8288382d5d9df65828d6608',
+  delete: true,
+});
 manifestFiles.push({
   path: 'mobile/android/fenix/app/src/main/res/drawable/ru_browser_icon.xml',
   originalSha256: null,

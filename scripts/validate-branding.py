@@ -52,4 +52,10 @@ assert 'applicationId "org.mozilla"' not in gradle
 logo = json.loads((project / 'config/logo-assets.json').read_text(encoding='utf-8'))
 for path, digest in logo['files'].items():
     assert hashlib.sha256((project / path).read_bytes()).hexdigest() == digest, path
+icon_xml = 'mobile/android/fenix/app/src/main/res/drawable/ic_firefox.xml'
+icon_entries = {entry['path']: entry for entry in manifest['files'] if 'ic_firefox' in entry['path']}
+assert icon_entries[icon_xml].get('delete') is True, icon_xml
+for density in ('mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi'):
+    path = f'mobile/android/fenix/app/src/main/res/drawable-{density}/ic_firefox.png'
+    assert path in icon_entries and not icon_entries[path].get('delete'), path
 print(f'Validated {xml_count} XML files, unchanged keys/attributes/comments, application names, NSS bytes, pinned logo assets and application ID configuration.')

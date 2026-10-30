@@ -3,7 +3,7 @@
   "revision": "9a2dc53c369c7ae5172018b35988e1d2ffeff402",
   "tag": "FIREFOX-ANDROID_159_0_RELEASE",
   "version": "159.0",
-  "verifiedOn": "2026-10-28",
+  "verifiedOn": "2026-10-30",
   "channel": "release",
   "sourceFiles": [
     "security/nss/lib/ckfw/builtins/certdata.txt",

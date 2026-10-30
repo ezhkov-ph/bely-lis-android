@@ -228,6 +228,7 @@
     "mobile/android/branding/unofficial/locales/en-US/brand.ftl": "b83a13d3c9a378a2d77cdd918ea2a04975a1571e943dd6fc197033828099e624",
     "mobile/android/branding/unofficial/locales/en-US/brand.properties": "e1c4577c0bebc77c8003da62294f9c0ca069a46d5741cddfae736a417984603c",
     "mobile/android/fenix/app/src/beta/res/values/static_strings.xml": "4b3e686a18c0aaf013f05e876b3984ac6254490dcfce86e9b1646963ec5c179f",
+    "mobile/android/fenix/app/src/main/java/org/mozilla/fenix/iconpicker/AppIcon.kt": "f5574732652b022283b6bd884e169b1a199c63540b7cd5dd3e5ce10995e81c86",
     "mobile/android/fenix/app/src/main/java/org/mozilla/fenix/pbmlock/UnlockPrivateTabsScreen.kt": "3205258d5199a74594bdd9cb6bbbd0a9864a164e5e38712ea119377cc2d8e9ad",
     "mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/about/AboutFragment.kt": "140c84e9549cd5e03c0462ed0e26f7e9c485c1d98e1011016f498a3436bfe141",
     "mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/biometric/ui/UnlockScreen.kt": "a40979f1526f335e48d85b40c8366434e55523c6c3add70769bfe8b7d8bb6de2",
