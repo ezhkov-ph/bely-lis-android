@@ -208,8 +208,14 @@ try {
         Write-Status 'running' 'publish' "Publishing White Fox $version"
         if ($shouldUpdate) {
             Invoke-Checked 'git' @('-C', $root, 'add', 'README.md', 'config/upstream.json', 'config/source-hashes.json', 'config/branding-source-hashes.json')
-            Invoke-Checked 'git' @('-C', $root, 'commit', '-m', "Firefox Android $version")
-            Invoke-Checked 'git' @('-C', $root, 'push', 'origin', 'HEAD')
+            $stagedPaths = @(& git -C $root diff --cached --name-only)
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Unable to inspect staged release metadata'
+            }
+            if ($stagedPaths.Count -gt 0) {
+                Invoke-Checked 'git' @('-C', $root, 'commit', '-m', "Firefox Android $version")
+                Invoke-Checked 'git' @('-C', $root, 'push', 'origin', 'HEAD')
+            }
         }
         $tag = "v$version-$($config.releaseTagSuffix)"
         $notes = Join-Path $automation "release-$version.md"
