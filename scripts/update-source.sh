@@ -51,7 +51,11 @@ fi
 test "$(git -C "$source" rev-parse "refs/tags/$tag^{commit}")" = "$revision"
 previous_revision=$(git -C "$source" rev-parse HEAD 2>/dev/null || true)
 git -C "$source" reset --hard
-git -C "$source" clean -fd
+if [ "$previous_revision" = "$revision" ]; then
+  git -C "$source" clean -fd -e obj-ru-arm64/
+else
+  git -C "$source" clean -fd
+fi
 git -C "$source" checkout --force --detach "$revision"
 if [ "$previous_revision" != "$revision" ]; then
   rm -rf "$source/obj-ru-arm64"
