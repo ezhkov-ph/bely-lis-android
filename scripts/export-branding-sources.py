@@ -18,6 +18,7 @@ paths = subprocess.check_output([
     'mobile/android/geckoview/src/main/res/values*/*.xml',
     'mobile/android/branding/unofficial/*',
     'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/about/AboutFragment.kt',
+    'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/iconpicker/AppIcon.kt',
     'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/home/ui/Wordmark.kt',
     'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/pbmlock/UnlockPrivateTabsScreen.kt',
     'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/biometric/ui/UnlockScreen.kt',

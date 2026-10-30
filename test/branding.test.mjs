@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { rewriteStrings } from '../scripts/branding.mjs';
+import { rewriteComposeAppIcon, rewriteStrings } from '../scripts/branding.mjs';
 
 const path = 'mobile/android/fenix/app/src/main/res/values/strings.xml';
 const branding = { displayName: 'Белый лис', about: { default: '%1$s is independent, based on Mozilla Firefox.', ru: '%1$s — независимый браузер на основе Mozilla Firefox.' } };
@@ -37,4 +37,11 @@ test('rejects lost or changed placeholders and changed URLs', () => {
 
 test('about copy describes the fork without dropping the product placeholder', () => {
   assert.equal(rewrite('<string name="about_content">%1$s is produced by Mozilla.</string>'), '<string name="about_content">%1$s is independent, based on Mozilla Firefox.</string>');
+});
+
+test('uses the raster launcher resource directly in Compose app icon previews', () => {
+  const source = '@param:DrawableRes val iconForegroundId: Int = R.drawable.ic_firefox,';
+  const result = rewriteComposeAppIcon(source);
+  assert.equal(result, '@param:DrawableRes val iconForegroundId: Int = R.mipmap.white_fox_launcher,');
+  assert.doesNotMatch(result, /R\.drawable\.ic_firefox/);
 });

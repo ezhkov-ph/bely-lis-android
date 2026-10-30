@@ -76,6 +76,15 @@ function replaceOnce(text, before, after, path) {
   return text.replace(before, after);
 }
 
+export function rewriteComposeAppIcon(text, path = 'AppIcon.kt') {
+  return replaceOnce(
+    text,
+    '@param:DrawableRes val iconForegroundId: Int = R.drawable.ic_firefox,',
+    '@param:DrawableRes val iconForegroundId: Int = R.mipmap.white_fox_launcher,',
+    path,
+  );
+}
+
 export async function prepareBranding({ source, pins, branding, russian, outputs }) {
   const changes = [];
   const preserved = [];
@@ -100,6 +109,10 @@ export async function prepareBranding({ source, pins, branding, russian, outputs
   }
 
   const java = `${appPrefix}main/java/org/mozilla/fenix/`;
+  const appIconPath = java + 'iconpicker/AppIcon.kt';
+  outputs.set(appIconPath, rewriteComposeAppIcon(await source(appIconPath), appIconPath));
+  changes.push({ path: appIconPath, key: 'Compose app-icon preview uses a raster resource directly' });
+
   const aboutPath = java + 'settings/about/AboutFragment.kt';
   outputs.set(aboutPath, replaceOnce(await source(aboutPath),
     'getString(R.string.about_whats_new, getString(R.string.firefox))',

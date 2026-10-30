@@ -2,7 +2,7 @@
   "enabled": true,
   "wslDistribution": "Ubuntu",
   "autoPublish": true,
-  "releaseTagSuffix": "belylis.1",
+  "releaseTagSuffix": "belylis.2",
   "taskName": "Белый лис — проверка обновлений",
   "dailyCheckTime": "10:00",
   "requireCleanGit": true

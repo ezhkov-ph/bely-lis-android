@@ -150,7 +150,8 @@ try {
     # A stopped task may already have pinned the source revision but not have
     # produced or published its APK. Resume that exact release instead of
     # reporting it as current solely because the pin was written.
-    $shouldUpdate = -not $PublishCurrent -and ($isNew -or ((-not $releaseExists) -and -not (Test-Path -LiteralPath $candidateApk)))
+    $missingReleaseOutput = if ($publish) { -not $releaseExists } else { -not (Test-Path -LiteralPath $candidateApk) }
+    $shouldUpdate = -not $PublishCurrent -and ($isNew -or $missingReleaseOutput)
     if (-not $shouldUpdate -and -not $PublishCurrent) {
         Write-Status 'complete' 'no-update' "Firefox Android $($current.version) is current"
         return
