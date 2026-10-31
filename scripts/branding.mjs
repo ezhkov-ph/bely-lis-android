@@ -51,6 +51,10 @@ export function rewriteStrings(xml, path, branding, russian, changes, preserved)
     let result = value;
     if (isApp && key === 'about_content') {
       result = branding.about[isRussian ? 'ru' : 'default'];
+    } else if (isApp && key === 'preferences_rate') {
+      result = isRussian ? (russian.preferences_rate || 'Обновить браузер') : (branding.preferences_rate || 'Check for updates');
+    } else if (isApp && key === 'preferences_start_profiler') {
+      result = isRussian ? (russian.preferences_start_profiler || 'Сертификаты Минцифры') : (branding.preferences_start_profiler || 'Russian CA certificates');
     } else if (isApp && isRussian && Object.hasOwn(russian, key)) {
       result = russian[key];
     } else if (isApp && applicationKeys.has(key)) {
@@ -117,6 +121,114 @@ export async function prepareBranding({ source, pins, branding, russian, outputs
   outputs.set(aboutPath, replaceOnce(await source(aboutPath),
     'getString(R.string.about_whats_new, getString(R.string.firefox))',
     'getString(R.string.about_whats_new, getString(R.string.upstream_firefox_name))', aboutPath));
+
+  const prefsXmlPath = `${appPrefix}main/res/xml/preferences.xml`;
+  if (pins.files[prefsXmlPath]) {
+    let prefsXml = await source(prefsXmlPath);
+    const oldProfilerChunk = `        <androidx.preference.Preference
+            android:key="@string/pref_key_start_profiler"
+            app:iconSpaceReserved="false"
+            android:title="@string/preferences_start_profiler"
+            app:isPreferenceVisible="false" />`;
+
+    const newProfilerItem = `
+        <androidx.preference.Preference
+            android:key="@string/pref_key_start_profiler"
+            app:iconSpaceReserved="false"
+            android:title="@string/preferences_start_profiler"
+            app:isPreferenceVisible="true" />`;
+
+    const rateTarget = `        <androidx.preference.Preference
+            android:key="@string/pref_key_rate"
+            app:iconSpaceReserved="false"
+            android:title="@string/preferences_rate" />`;
+
+    prefsXml = replaceOnce(prefsXml, oldProfilerChunk, '', prefsXmlPath);
+    prefsXml = replaceOnce(prefsXml, rateTarget, `${rateTarget}\n${newProfilerItem}`, prefsXmlPath);
+    outputs.set(prefsXmlPath, prefsXml);
+    changes.push({ path: prefsXmlPath, key: 'Position Russian CA setting between Rate/Update and About' });
+  }
+
+  const settingsPath = java + 'settings/SettingsFragment.kt';
+  if (pins.files[settingsPath]) {
+    let settings = await source(settingsPath);
+    settings = replaceOnce(
+      settings,
+      `                // About preferences
+                resources.getString(R.string.pref_key_rate) -> {
+                    components.playStoreReviewPromptController.tryLaunchPlayStoreReview(
+                        requireActivity(),
+                        ::openInNewTab,
+                    )
+                    null
+                }`,
+      `                // About preferences
+                resources.getString(R.string.pref_key_rate) -> {
+                    ru.belylis.WhiteFoxUpdater.checkUpdate(requireActivity())
+                    null
+                }`,
+      settingsPath,
+    );
+
+    settings = replaceOnce(
+      settings,
+      `                // Only displayed when secret settings are enabled
+                resources.getString(R.string.pref_key_start_profiler) -> {
+                    if (profilerViewModel.isProfilerActive.value) {
+                        SettingsFragmentDirections.actionSettingsFragmentToStopProfilerDialog()
+                    } else {
+                        SettingsFragmentDirections.actionSettingsFragmentToStartProfilerDialog()
+                    }
+                }`,
+      `                resources.getString(R.string.pref_key_start_profiler) -> {
+                    ru.belylis.WhiteFoxUpdater.showCaModeDialog(requireActivity(), it)
+                    null
+                }`,
+      settingsPath,
+    );
+
+    settings = replaceOnce(
+      settings,
+      `        val preferenceStartProfiler = findPreference<Preference>(getPreferenceKey(R.string.pref_key_start_profiler))
+
+        with(settings) {`,
+      `        val preferenceStartProfiler = findPreference<Preference>(getPreferenceKey(R.string.pref_key_start_profiler))
+        preferenceStartProfiler?.let {
+            it.isVisible = true
+            ru.belylis.WhiteFoxUpdater.updateCaSummary(it, requireContext())
+        }
+
+        with(settings) {`,
+      settingsPath,
+    );
+
+    settings = replaceOnce(
+      settings,
+      `    private fun updateProfilerUI(profilerStatus: Boolean) {
+        if (profilerStatus) {
+            findPreference<Preference>(getPreferenceKey(R.string.pref_key_start_profiler))?.title =
+                resources.getString(R.string.profiler_stop)
+            findPreference<Preference>(getPreferenceKey(R.string.pref_key_start_profiler))?.summary =
+                resources.getString(R.string.profiler_running)
+        } else {
+            findPreference<Preference>(getPreferenceKey(R.string.pref_key_start_profiler))?.title =
+                resources.getString(R.string.preferences_start_profiler)
+            findPreference<Preference>(getPreferenceKey(R.string.pref_key_start_profiler))?.summary = ""
+        }
+    }`,
+      `    private fun updateProfilerUI(profilerStatus: Boolean) {
+        findPreference<Preference>(getPreferenceKey(R.string.pref_key_start_profiler))?.let {
+            it.title = resources.getString(R.string.preferences_start_profiler)
+            it.isVisible = true
+            ru.belylis.WhiteFoxUpdater.updateCaSummary(it, requireContext())
+        }
+    }`,
+      settingsPath,
+    );
+
+    outputs.set(settingsPath, settings);
+    changes.push({ path: settingsPath, key: 'Replace Rate on Google Play and configure Russian CA settings in SettingsFragment' });
+  }
 
   const wordmarkPath = java + 'home/ui/Wordmark.kt';
   if (pins.files[wordmarkPath]) {

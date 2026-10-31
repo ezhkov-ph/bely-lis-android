@@ -9,6 +9,9 @@
     "mobile/android/fenix/app/src/main/res/values/static_strings.xml": "f4367601d1e1bebacce27c09ac3224d48965d2af9302ba735700aa1ba3528b7f",
     "mobile/android/config/mozconfigs/common": "a3c6e1e5eaea4d77f3e6a6b3545618df76d218edcf05deadfcd9bbd8a1a643ae",
     "mobile/android/config/mozconfigs/android-aarch64/nightly": "c8879e18cb86716e0e8939d91c065fb1b324c5f04ce609ee4b0311bf35b3cf46",
+    "mobile/shared/components/geckoview/GeckoViewStartup.sys.mjs": "8cf315acdae8ee0b886439cca3635fbc9bf78e1d13ea39a1020b27fc3c6a60b0",
+    "mobile/android/fenix/app/src/main/res/drawable/ic_firefox.xml": "ee0e9fe317dae048c1781f28e7e542851385045fb012c6b5fd86f6ae56b6060d",
+    "mobile/android/fenix/app/src/main/res/drawable/ic_onboarding_welcome.xml": "f71af0bf3df4775c20ab938ba76c86e4920f26c9058798bb7f5c51fcf982ce96",
     "browser/config/version.txt": "cdc0d76321cc8e3b8480fcf3869660b634ab03e4987a1e3829aade5fce74d31f"
   }
 }

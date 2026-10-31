@@ -16,3 +16,6 @@ Thumbs.db
 .idea/
 .vscode/
 branding/source/white-fox-original.svg
+*.apk
+*.idsig
+*.dex

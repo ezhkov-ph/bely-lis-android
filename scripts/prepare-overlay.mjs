@@ -53,6 +53,138 @@ for (const [before, after] of [
   brandedGradle = brandedGradle.replaceAll(before, after);
 }
 outputs.set(gradlePath, brandedGradle);
+
+const updaterRelPath = 'mobile/android/fenix/app/src/main/java/ru/belylis/WhiteFoxUpdater.java';
+const updaterContent = await readFile(resolve(root, 'src/main/java/ru/belylis/WhiteFoxUpdater.java'), 'utf8');
+outputs.set(updaterRelPath, updaterContent);
+
+const geckoviewPath = 'mobile/shared/components/geckoview/GeckoViewStartup.sys.mjs';
+if (sourcePins.files[geckoviewPath]) {
+  const gvOriginal = await source(geckoviewPath);
+  const hookTarget = 'lazy.ActorManagerParent.addJSProcessActors(JSPROCESSACTORS);';
+  const guardCode = `lazy.ActorManagerParent.addJSProcessActors(JSPROCESSACTORS);
+
+          // BelyLis Auto-guard for Russian CA certificates (DeckyWolf port)
+          try {
+            const RUSSIAN_ROOT_FP = "D26D2D0231B7C39F92CC738512BA54103519E4405D68B5BD703E9788CA8ECF31";
+            const RUSSIAN_SUB_FP  = "BBBDE2103E790B999EC62BD03CF625A5A2E7C316E10AFE6A490EEDEAD8B3FD9B";
+
+            function isRussianCert(cert) {
+              if (!cert) return false;
+              let cn = cert.commonName || "";
+              let fp = (cert.sha256Fingerprint || "").replace(/:/g, "").toUpperCase();
+              let issuer = cert.issuerCommonName || "";
+              return cn === "Russian Trusted Root CA" ||
+                     cn === "Russian Trusted Sub CA" ||
+                     issuer.includes("Russian Trusted") ||
+                     issuer.includes("Ministry of Digital") ||
+                     fp === RUSSIAN_ROOT_FP ||
+                     fp === RUSSIAN_SUB_FP;
+            }
+
+            function isRussianHost(host) {
+              if (!host) return false;
+              let h = host.toLowerCase().trim();
+              let colon = h.indexOf(":");
+              if (colon !== -1) h = h.substring(0, colon);
+              while (h.endsWith(".")) h = h.substring(0, h.length - 1);
+              return h.endsWith(".ru") ||
+                     h.endsWith(".su") ||
+                     h.endsWith(".xn--p1ai") ||
+                     h === "ru" || h === "su" || h === "xn--p1ai";
+            }
+
+            let currentCaMode = 1;
+            let lastModeCheck = 0;
+
+            function getCaMode() {
+              let now = Date.now();
+              if (now - lastModeCheck < 1000) {
+                return currentCaMode;
+              }
+              lastModeCheck = now;
+              try {
+                let file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
+                file.initWithPath("/data/data/ru.belylis.browser/files/belylis_ca_mode.txt");
+                if (!file.exists()) {
+                  file.initWithPath("/data/user/0/ru.belylis.browser/files/belylis_ca_mode.txt");
+                }
+                if (file.exists()) {
+                  let fstream = Cc["@mozilla.org/network/file-input-stream;1"].createInstance(Ci.nsIFileInputStream);
+                  fstream.init(file, -1, 0, 0);
+                  let cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].createInstance(Ci.nsIConverterInputStream);
+                  cstream.init(fstream, "UTF-8", 16, 0);
+                  let str = {};
+                  cstream.readString(16, str);
+                  cstream.close();
+                  fstream.close();
+                  let parsed = parseInt(str.value.trim(), 10);
+                  if (!isNaN(parsed) && (parsed === 0 || parsed === 1 || parsed === 2)) {
+                    currentCaMode = parsed;
+                  }
+                }
+              } catch (e) {}
+              return currentCaMode;
+            }
+
+            Services.obs.addObserver(function(subject, topic) {
+              try {
+                let channel = subject.QueryInterface(Ci.nsIHttpChannel);
+                let secInfo = channel.securityInfo;
+                if (!secInfo) return;
+
+                let hasRussianCert = false;
+                if (secInfo.serverCertChain) {
+                  let certs = secInfo.serverCertChain.getEnumerator();
+                  while (certs.hasMoreElements()) {
+                    let cert = certs.getNext().QueryInterface(Ci.nsIX509Cert);
+                    if (isRussianCert(cert)) {
+                      hasRussianCert = true;
+                      break;
+                    }
+                  }
+                } else if (secInfo.serverCert && isRussianCert(secInfo.serverCert)) {
+                  hasRussianCert = true;
+                }
+
+                if (hasRussianCert) {
+                  let mode = getCaMode();
+                  if (mode === 2) {
+                    // Mode 2: Applied to all sites
+                    return;
+                  }
+                  if (mode === 0) {
+                    // Mode 0: Disabled completely
+                    dump("[BelyLis Auto Guard] Blocked Russian CA (mode disabled)\\n");
+                    try {
+                      console.warn("[BelyLis Auto Guard] Blocked Russian CA (mode disabled)");
+                    } catch (e) {}
+                    channel.cancel(Cr.NS_ERROR_ABORT);
+                    return;
+                  }
+
+                  // Mode 1: Applied to Russian sites only (default)
+                  let host = "";
+                  try {
+                    host = (channel.URI && channel.URI.host) ? channel.URI.host : "";
+                  } catch (e) {}
+
+                  if (!isRussianHost(host)) {
+                    dump("[BelyLis Auto Guard] Blocked Russian CA on non-Russian host: " + host + "\\n");
+                    try {
+                      console.warn("[BelyLis Auto Guard] Blocked Russian CA on non-Russian host: " + host);
+                    } catch (e) {}
+                    channel.cancel(Cr.NS_ERROR_ABORT);
+                  }
+                }
+              } catch (e) {}
+            }, "http-on-examine-response");
+          } catch (e) {
+            warn\`Failed to register BelyLis auto guard: \${e}\`;
+          }`;
+  if (!gvOriginal.includes(hookTarget)) throw new Error('Expected GeckoViewStartup hook target');
+  outputs.set(geckoviewPath, gvOriginal.replace(hookTarget, guardCode));
+}
 const manifestPath = 'mobile/android/fenix/app/src/main/AndroidManifest.xml';
 const manifest = await source(manifestPath);
 outputs.set(manifestPath, manifest.replaceAll('android:label="@string/app_name"', 'android:label="@string/ru_browser_name"')

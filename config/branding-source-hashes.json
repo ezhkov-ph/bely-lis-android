@@ -356,6 +356,8 @@
     "mobile/android/fenix/app/src/main/res/values/static_strings.xml": "f4367601d1e1bebacce27c09ac3224d48965d2af9302ba735700aa1ba3528b7f",
     "mobile/android/fenix/app/src/main/res/values/strings.xml": "2f572d83d6caf95b77c032e149953f4aacd617c4f99556df286b5de1370c6d8e",
     "mobile/android/fenix/app/src/nightly/res/values/static_strings.xml": "5e651f98abeb3243ad29cf7be27596ea7ee827d74869f2f9288e97a50cc4babf",
-    "mobile/android/fenix/app/src/release/res/values/static_strings.xml": "2e0f0c8d496c73a315e4ad4f640592803496ae5643afdf952dd5cd21748190c8"
+    "mobile/android/fenix/app/src/release/res/values/static_strings.xml": "2e0f0c8d496c73a315e4ad4f640592803496ae5643afdf952dd5cd21748190c8",
+    "mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/SettingsFragment.kt": "afca21b38f6391e020588caba7d42d3264326af5e2a23c2e37ebcebec5a636be",
+    "mobile/android/fenix/app/src/main/res/xml/preferences.xml": "29aec33a5601e3e9aa0fdb2abdcebe0c91886edc07af46da5c0d458250a0d29f"
   }
 }

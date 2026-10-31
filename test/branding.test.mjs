@@ -45,3 +45,19 @@ test('uses the raster launcher resource directly in Compose app icon previews', 
   assert.equal(result, '@param:DrawableRes val iconForegroundId: Int = R.mipmap.white_fox_launcher,');
   assert.doesNotMatch(result, /R\.drawable\.ic_firefox/);
 });
+
+test('replaces rate on Google Play with check for updates', () => {
+  const xml = '<string name="preferences_rate">Rate on Google Play</string>';
+  assert.equal(rewrite(xml), '<string name="preferences_rate">Check for updates</string>');
+  const ruPath = path.replace('/values/', '/values-ru/');
+  assert.equal(rewrite(xml, ruPath, { preferences_rate: 'Проверить обновления' }),
+    '<string name="preferences_rate">Проверить обновления</string>');
+});
+
+test('replaces start profiler with russian ca certificates', () => {
+  const xml = '<string name="preferences_start_profiler">Start Profiler</string>';
+  assert.equal(rewrite(xml), '<string name="preferences_start_profiler">Russian CA certificates</string>');
+  const ruPath = path.replace('/values/', '/values-ru/');
+  assert.equal(rewrite(xml, ruPath, { preferences_start_profiler: 'Сертификаты Минцифры' }),
+    '<string name="preferences_start_profiler">Сертификаты Минцифры</string>');
+});
