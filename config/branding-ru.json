@@ -1,4 +1,5 @@
 {
+  "preferences_rate": "Обновить браузер",
   "onboarding_preferences_dialog_title": "Помогите нам сделать «Белый лис» лучше",
   "onboarding_preferences_dialog_usage_data_description_2": "Данные о вашем устройстве, конфигурации оборудования и о том, как вы используете браузер «Белый лис», помогают улучшить возможности, производительность и стабильность для всех и каждого.",
   "onboarding_welcome_to_firefox": "Добро пожаловать в «Белый лис»",
@@ -69,5 +70,6 @@
   "setup_checklist_group_essentials": "Основное для браузера «%1$s»",
   "review_prompt_pre_prompt_header": "Что вы думаете о браузере «%1$s»?",
   "firefox_labs_experimental_description": "Они находятся в разработке, что может повлиять на работу браузера «%s».",
-  "firefox_labs_share_feedback_content_description": "Поделиться отзывом о браузере «%s»."
+  "firefox_labs_share_feedback_content_description": "Поделиться отзывом о браузере «%s».",
+  "preferences_start_profiler": "Сертификаты Минцифры"
 }
