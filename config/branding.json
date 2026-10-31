@@ -17,5 +17,5 @@
     "mobile/android/fenix/app/src/main/java/org/mozilla/fenix/pbmlock/UnlockPrivateTabsScreen.kt": "b082e613db20b2ace0b2604639f7eef0824cbfaaa8ae0bc2842d536a60e83168",
     "mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/biometric/ui/UnlockScreen.kt": "2776e44e4734f267d02f0b1f89b713ef216d0b19853f8ae47c464ba8609e4848"
   },
-  "preferences_start_profiler": "Russian CA certificates"
+  "preferences_start_profiler": "Сертификаты Минцифры"
 }

@@ -51,8 +51,11 @@ def main():
         ], check=True, env=env)
         signature = subprocess.check_output([str(signer), 'verify', '--verbose', '--print-certs', str(signed)], env=env, text=True, stderr=subprocess.STDOUT)
         badging = subprocess.check_output([str(aapt), 'dump', 'badging', str(signed)], env=env, text=True, stderr=subprocess.STDOUT)
+        release_version = f"{UPSTREAM['version']}-{UPSTREAM['releaseTagSuffix']}"
         if f"package: name='{branding['releaseApplicationId']}'" not in badging:
             raise RuntimeError('Unexpected release applicationId')
+        if f"versionName='{release_version}'" not in badging:
+            raise RuntimeError('Unexpected release versionName')
         if 'application-debuggable' in badging:
             raise RuntimeError('Release APK is debuggable')
         expected_label = "'" + branding['displayName'] + "'"
@@ -77,6 +80,7 @@ def main():
     (OUTPUT / 'build-report.release.json').write_text(json.dumps({
         'upstream': json.loads((PROJECT / 'config/upstream.json').read_text()),
         'displayName': branding['displayName'], 'applicationId': branding['releaseApplicationId'],
+        'versionName': release_version,
         'apk': destination.name, 'sha256': checksum, 'bytes': destination.stat().st_size,
         'certificateLibraries': matches, 'signatureVerified': True, 'debuggable': False,
         'kind': 'locally-release-signed-arm64', 'deviceTests': 'not performed for this rebuilt APK',

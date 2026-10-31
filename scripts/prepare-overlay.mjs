@@ -52,10 +52,16 @@ for (const [before, after] of [
   if (!brandedGradle.includes(before)) throw new Error(`Expected Gradle branding token: ${before}`);
   brandedGradle = brandedGradle.replaceAll(before, after);
 }
+const releaseVersion = `${upstream.version}-${upstream.releaseTagSuffix}`;
+if (!/^belylis\.\d+$/.test(upstream.releaseTagSuffix)) throw new Error('Invalid release tag suffix');
+if (!brandedGradle.includes('output.versionName.set(versionName)')) throw new Error('Version output hook missing');
+brandedGradle = brandedGradle.replaceAll('output.versionName.set(versionName)', `output.versionName.set("${releaseVersion}")`);
 outputs.set(gradlePath, brandedGradle);
 
 const updaterRelPath = 'mobile/android/fenix/app/src/main/java/ru/belylis/WhiteFoxUpdater.java';
-const updaterContent = await readFile(resolve(root, 'src/main/java/ru/belylis/WhiteFoxUpdater.java'), 'utf8');
+const updaterTemplate = await readFile(resolve(root, 'src/main/java/ru/belylis/WhiteFoxUpdater.java'), 'utf8');
+if (updaterTemplate.split('@BELYLIS_VERSION@').length !== 2) throw new Error('Updater version placeholder missing or duplicated');
+const updaterContent = updaterTemplate.replace('@BELYLIS_VERSION@', releaseVersion);
 outputs.set(updaterRelPath, updaterContent);
 
 const geckoviewPath = 'mobile/shared/components/geckoview/GeckoViewStartup.sys.mjs';
@@ -134,10 +140,8 @@ if (sourcePins.files[geckoviewPath]) {
                 if (!secInfo) return;
 
                 let hasRussianCert = false;
-                if (secInfo.serverCertChain) {
-                  let certs = secInfo.serverCertChain.getEnumerator();
-                  while (certs.hasMoreElements()) {
-                    let cert = certs.getNext().QueryInterface(Ci.nsIX509Cert);
+                if (secInfo.succeededCertChain?.length) {
+                  for (let cert of secInfo.succeededCertChain) {
                     if (isRussianCert(cert)) {
                       hasRussianCert = true;
                       break;
@@ -184,7 +188,7 @@ if (sourcePins.files[geckoviewPath]) {
           }`;
   if (!gvOriginal.includes(hookTarget)) throw new Error('Expected GeckoViewStartup hook target');
   outputs.set(geckoviewPath, gvOriginal.replace(hookTarget, guardCode));
-}
+} else { throw new Error('Required GeckoView security input is not pinned'); }
 const manifestPath = 'mobile/android/fenix/app/src/main/AndroidManifest.xml';
 const manifest = await source(manifestPath);
 outputs.set(manifestPath, manifest.replaceAll('android:label="@string/app_name"', 'android:label="@string/ru_browser_name"')

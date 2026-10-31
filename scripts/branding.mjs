@@ -54,7 +54,7 @@ export function rewriteStrings(xml, path, branding, russian, changes, preserved)
     } else if (isApp && key === 'preferences_rate') {
       result = isRussian ? (russian.preferences_rate || 'Обновить браузер') : (branding.preferences_rate || 'Check for updates');
     } else if (isApp && key === 'preferences_start_profiler') {
-      result = isRussian ? (russian.preferences_start_profiler || 'Сертификаты Минцифры') : (branding.preferences_start_profiler || 'Russian CA certificates');
+      result = isRussian ? (russian.preferences_start_profiler || 'Сертификаты Минцифры') : (branding.preferences_start_profiler || 'Сертификаты Минцифры');
     } else if (isApp && isRussian && Object.hasOwn(russian, key)) {
       result = russian[key];
     } else if (isApp && applicationKeys.has(key)) {
@@ -123,6 +123,7 @@ export async function prepareBranding({ source, pins, branding, russian, outputs
     'getString(R.string.about_whats_new, getString(R.string.upstream_firefox_name))', aboutPath));
 
   const prefsXmlPath = `${appPrefix}main/res/xml/preferences.xml`;
+  if (!pins.files[prefsXmlPath]) throw new Error('Required preferences input missing');
   if (pins.files[prefsXmlPath]) {
     let prefsXml = await source(prefsXmlPath);
     const oldProfilerChunk = `        <androidx.preference.Preference
@@ -150,6 +151,7 @@ export async function prepareBranding({ source, pins, branding, russian, outputs
   }
 
   const settingsPath = java + 'settings/SettingsFragment.kt';
+  if (!pins.files[settingsPath]) throw new Error('Required SettingsFragment input missing');
   if (pins.files[settingsPath]) {
     let settings = await source(settingsPath);
     settings = replaceOnce(
@@ -181,7 +183,7 @@ export async function prepareBranding({ source, pins, branding, russian, outputs
                     }
                 }`,
       `                resources.getString(R.string.pref_key_start_profiler) -> {
-                    ru.belylis.WhiteFoxUpdater.showCaModeDialog(requireActivity(), it)
+                    ru.belylis.WhiteFoxUpdater.showCaModeDialog(requireActivity(), preference)
                     null
                 }`,
       settingsPath,
@@ -199,6 +201,14 @@ export async function prepareBranding({ source, pins, branding, russian, outputs
         }
 
         with(settings) {`,
+      settingsPath,
+    );
+
+    settings = replaceOnce(
+      settings,
+      `            preferenceStartProfiler?.isVisible =
+                showSecretDebugMenuThisSession && (components.core.engine.profiler?.isProfilerActive() != null)`,
+      `            preferenceStartProfiler?.isVisible = true`,
       settingsPath,
     );
 

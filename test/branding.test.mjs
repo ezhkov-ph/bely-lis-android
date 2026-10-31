@@ -56,7 +56,7 @@ test('replaces rate on Google Play with check for updates', () => {
 
 test('replaces start profiler with russian ca certificates', () => {
   const xml = '<string name="preferences_start_profiler">Start Profiler</string>';
-  assert.equal(rewrite(xml), '<string name="preferences_start_profiler">Russian CA certificates</string>');
+  assert.equal(rewrite(xml), '<string name="preferences_start_profiler">Сертификаты Минцифры</string>');
   const ruPath = path.replace('/values/', '/values-ru/');
   assert.equal(rewrite(xml, ruPath, { preferences_start_profiler: 'Сертификаты Минцифры' }),
     '<string name="preferences_start_profiler">Сертификаты Минцифры</string>');

@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 project = Path(__file__).resolve().parents[1]
 manifest = json.loads((project / 'artifacts/overlay-manifest.json').read_text(encoding='utf-8'))
 branding = json.loads((project / 'config/branding.json').read_text(encoding='utf-8'))
+upstream = json.loads((project / 'config/upstream.json').read_text(encoding='utf-8'))
 xml_count = 0
 for entry in manifest['files']:
     path = entry['path']
@@ -48,7 +49,14 @@ assert branded_certdata.count(b'Russian Trusted Root CA') >= 1, cert_path
 assert branded_certdata.count(b'Russian Trusted Sub CA') >= 1, cert_path
 gradle = (project / 'artifacts/overlay/mobile/android/fenix/app/build.gradle').read_text(encoding='utf-8')
 assert 'applicationId "ru.belylis"' in gradle
+assert 'applicationId "ru.belylis.test"' not in gradle
 assert 'applicationId "org.mozilla"' not in gradle
+expected_version = f"{upstream['version']}-{upstream['releaseTagSuffix']}"
+assert f'output.versionName.set("{expected_version}")' in gradle
+settings = (project / 'artifacts/overlay/mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/SettingsFragment.kt').read_text(encoding='utf-8')
+assert 'WhiteFoxUpdater.showCaModeDialog(requireActivity(), preference)' in settings
+assert 'preferenceStartProfiler?.isVisible = true' in settings
+assert 'preferenceStartProfiler?.isVisible =\n                showSecretDebugMenuThisSession' not in settings
 logo = json.loads((project / 'config/logo-assets.json').read_text(encoding='utf-8'))
 for path, digest in logo['files'].items():
     assert hashlib.sha256((project / path).read_bytes()).hexdigest() == digest, path

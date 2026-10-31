@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.widget.Toast;
 
@@ -27,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class WhiteFoxUpdater {
+    private static final String BELYLIS_VERSION = "@BELYLIS_VERSION@";
     public static final int CA_MODE_DISABLED = 0;
     public static final int CA_MODE_RU_ONLY = 1;
     public static final int CA_MODE_ALL = 2;
@@ -97,7 +97,7 @@ public class WhiteFoxUpdater {
         if (activity == null || activity.isFinishing()) return;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Сертификаты Минцифры");
+        builder.setTitle("Сертификаты Минцифры — эксперимент");
 
         final String[] options = new String[] {
             "Применено для российских сайтов\n(Включено по умолчанию)",
@@ -182,11 +182,7 @@ public class WhiteFoxUpdater {
                     }
 
                     final String finalApkUrl = apkUrl;
-                    String currentVersion = "";
-                    try {
-                        PackageInfo pInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
-                        currentVersion = pInfo.versionName;
-                    } catch (Exception ignored) {}
+                    String currentVersion = BELYLIS_VERSION;
 
                     final boolean hasUpdate = isNewerVersion(currentVersion, tagName);
                     final String currentVerStr = currentVersion;

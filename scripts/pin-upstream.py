@@ -31,10 +31,12 @@ def main():
     project, source = args.project.resolve(), args.source.resolve()
     candidate = json.loads(args.candidate.read_text(encoding="utf-8"))
     current = json.loads((project / "config/upstream.json").read_text(encoding="utf-8"))
+    automation = json.loads((project / "config/automation.json").read_text(encoding="utf-8"))
     revision = subprocess.check_output(["git", "-C", str(source), "rev-parse", "HEAD"], text=True).strip()
     if revision != candidate["revision"]:
         raise RuntimeError("Checked-out source does not match the candidate revision")
     candidate["sourceFiles"] = current["sourceFiles"]
+    candidate["releaseTagSuffix"] = automation["releaseTagSuffix"]
     atomic_json(project / "config/upstream.json", candidate)
 
     hashes = {}

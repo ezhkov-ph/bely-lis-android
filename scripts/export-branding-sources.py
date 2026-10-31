@@ -19,6 +19,8 @@ paths = subprocess.check_output([
     'mobile/android/branding/unofficial/*',
     'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/about/AboutFragment.kt',
     'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/iconpicker/AppIcon.kt',
+    'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/SettingsFragment.kt',
+    'mobile/android/fenix/app/src/main/res/xml/preferences.xml',
     'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/home/ui/Wordmark.kt',
     'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/pbmlock/UnlockPrivateTabsScreen.kt',
     'mobile/android/fenix/app/src/main/java/org/mozilla/fenix/settings/biometric/ui/UnlockScreen.kt',
@@ -31,7 +33,7 @@ for path in paths:
     data = subprocess.check_output(['git', '-C', str(source), 'show', f'{revision}:{path}'])
     text = data.decode('utf-8')
     visible = re.sub(r'<!--.*?-->', '', text, flags=re.S)
-    if not re.search(r'Firefox|Fennec|Fenix|Mozilla|app_name', visible):
+    if not re.search(r'Firefox|Fennec|Fenix|Mozilla|app_name', visible) and not path.endswith('/res/xml/preferences.xml'):
         continue
     destination = project / 'work/upstream' / path
     destination.parent.mkdir(parents=True, exist_ok=True)
