@@ -1,10 +1,9 @@
 {
   "repository": "https://github.com/mozilla-firefox/firefox.git",
-  "revision": "9a2dc53c369c7ae5172018b35988e1d2ffeff402",
-  "tag": "FIREFOX-ANDROID_159_0_RELEASE",
-  "version": "159.0",
-  "releaseTagSuffix": "belylis.3",
-  "verifiedOn": "2026-10-30",
+  "revision": "6181e6b5f28a8fbae1d5c3ef6f6626b5a2180213",
+  "tag": "FIREFOX-ANDROID_159_0_1_RELEASE",
+  "version": "159.0.1",
+  "verifiedOn": "2026-11-04",
   "channel": "release",
   "sourceFiles": [
     "mobile/shared/components/geckoview/GeckoViewStartup.sys.mjs",
@@ -17,5 +16,6 @@
     "mobile/android/config/mozconfigs/common",
     "mobile/android/config/mozconfigs/android-aarch64/nightly",
     "browser/config/version.txt"
-  ]
+  ],
+  "releaseTagSuffix": "belylis.1"
 }
