@@ -1,15 +1,15 @@
 {
-  "revision": "6181e6b5f28a8fbae1d5c3ef6f6626b5a2180213",
+  "revision": "2887d9de1f69c0e9776413da80e7ba0d1225dd9b",
   "files": {
     "mobile/shared/components/geckoview/GeckoViewStartup.sys.mjs": "8cf315acdae8ee0b886439cca3635fbc9bf78e1d13ea39a1020b27fc3c6a60b0",
-    "security/nss/lib/ckfw/builtins/certdata.txt": "beb7e6dfe6499926e52c075c27bcfbe4c957f8609c575b3860273ae2806f63eb",
+    "security/nss/lib/ckfw/builtins/certdata.txt": "3ec2b4d240dc12c747eaf450061db84af757c483bbda302f9e29ceb5d70be510",
     "security/nss/lib/ckfw/builtins/certdata.perl": "cc964e693755833ba7e25554afb17d455774175042f68b7b15e2afb16d2d842a",
-    "mobile/android/fenix/app/build.gradle": "1feef5b12b10deee4195a4a4e6c905c5c8d199757054f60b16384a679dc10999",
-    "mobile/android/fenix/app/src/main/AndroidManifest.xml": "fd27e95bf7f48dfdcff53fe3ff2af77ff3009031840b42993fc4986ec5e82f07",
-    "mobile/android/fenix/app/src/main/res/values/strings.xml": "2f572d83d6caf95b77c032e149953f4aacd617c4f99556df286b5de1370c6d8e",
-    "mobile/android/fenix/app/src/main/res/values/static_strings.xml": "f4367601d1e1bebacce27c09ac3224d48965d2af9302ba735700aa1ba3528b7f",
-    "mobile/android/config/mozconfigs/common": "a3c6e1e5eaea4d77f3e6a6b3545618df76d218edcf05deadfcd9bbd8a1a643ae",
+    "mobile/android/fenix/app/build.gradle": "6858910d4b65faeddb6aa99828a32e865188bf1b8cee0c52c3ef9d9795ae9c97",
+    "mobile/android/fenix/app/src/main/AndroidManifest.xml": "c27f2d97795413981f70fc872ca5f21df71d834afcb9ec46eb3a31382d3d8b75",
+    "mobile/android/fenix/app/src/main/res/values/strings.xml": "a11df2ea5e9299ea7c1960573db34bb2eedffb54599f94c1440c24e058966995",
+    "mobile/android/fenix/app/src/main/res/values/static_strings.xml": "8346258fdef7749e4ac3974bbb8bead052d6181f8da21504a55bf5150b2bec7d",
+    "mobile/android/config/mozconfigs/common": "38ce27623e584b849af6ac583934b434e109e70e4b2d26c2d92188f776e45ab5",
     "mobile/android/config/mozconfigs/android-aarch64/nightly": "c8879e18cb86716e0e8939d91c065fb1b324c5f04ce609ee4b0311bf35b3cf46",
-    "browser/config/version.txt": "2a4194fcb6cfb3a7b0a40d8b00e2fc6a76723834193207db5e04bbcc6464001c"
+    "browser/config/version.txt": "6e32e511a2ce8d4235835d693e7d27039e2971e3842087c82390d2e8c93b2c15"
   }
 }
