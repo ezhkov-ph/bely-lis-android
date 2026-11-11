@@ -87,6 +87,23 @@ def logged(command, name, env, cwd=SOURCE):
         raise SystemExit(result.returncode)
 
 
+def logged_with_gradle_retry(command, name, env, cwd=SOURCE):
+    """Retry one GeckoView build after resetting its Gradle daemon.
+
+    A Firefox source revision change can leave Gradle's generated Android
+    bindings in a transitional state.  Retrying once is safe and lets the
+    normal source checkout remain the authority; a second failure still stops
+    the release for inspection.
+    """
+    try:
+        logged(command, name, env, cwd)
+    except SystemExit:
+        print(f'{name}: stopping Gradle daemon and retrying once', flush=True)
+        logged(['./mach', 'gradle', '--stop'], name + '-gradle-stop', env, cwd)
+        repair_incomplete_ipdl()
+        logged(command, name, env, cwd)
+
+
 def ensure_release_ndk(env):
     android_script = 'python/mozboot/mozboot/android.py'
     upstream_script = subprocess.check_output(
@@ -248,7 +265,7 @@ def main():
             if args.stage in ('release', 'release-applied'):
                 status.write_text(json.dumps({'status': 'running', 'stage': 'GeckoView'}), encoding='utf-8')
                 repair_incomplete_ipdl()
-                logged(['./mach', 'build'], 'release-geckoview', env)
+                logged_with_gradle_retry(['./mach', 'build'], 'release-geckoview', env)
             # GeckoView and Fenix can select different daemon JVMs. Release
             # the completed GeckoView daemon before starting R8 in Fenix.
             logged(['./mach', 'gradle', '--stop'], 'release-gradle-stop', env)
