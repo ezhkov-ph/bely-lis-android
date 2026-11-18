@@ -1,9 +1,9 @@
 {
   "repository": "https://github.com/mozilla-firefox/firefox.git",
-  "revision": "2887d9de1f69c0e9776413da80e7ba0d1225dd9b",
-  "tag": "FIREFOX-ANDROID_160_0_RELEASE",
-  "version": "160.0",
-  "verifiedOn": "2026-11-11",
+  "revision": "58fed86b1b6864ad71b83c910a879d6f1a6b678b",
+  "tag": "FIREFOX-ANDROID_160_0_1_RELEASE",
+  "version": "160.0.1",
+  "verifiedOn": "2026-11-18",
   "channel": "release",
   "sourceFiles": [
     "mobile/shared/components/geckoview/GeckoViewStartup.sys.mjs",

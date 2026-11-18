@@ -1,5 +1,5 @@
 {
-  "revision": "2887d9de1f69c0e9776413da80e7ba0d1225dd9b",
+  "revision": "58fed86b1b6864ad71b83c910a879d6f1a6b678b",
   "files": {
     "mobile/shared/components/geckoview/GeckoViewStartup.sys.mjs": "8cf315acdae8ee0b886439cca3635fbc9bf78e1d13ea39a1020b27fc3c6a60b0",
     "security/nss/lib/ckfw/builtins/certdata.txt": "3ec2b4d240dc12c747eaf450061db84af757c483bbda302f9e29ceb5d70be510",
@@ -10,6 +10,6 @@
     "mobile/android/fenix/app/src/main/res/values/static_strings.xml": "8346258fdef7749e4ac3974bbb8bead052d6181f8da21504a55bf5150b2bec7d",
     "mobile/android/config/mozconfigs/common": "38ce27623e584b849af6ac583934b434e109e70e4b2d26c2d92188f776e45ab5",
     "mobile/android/config/mozconfigs/android-aarch64/nightly": "c8879e18cb86716e0e8939d91c065fb1b324c5f04ce609ee4b0311bf35b3cf46",
-    "browser/config/version.txt": "6e32e511a2ce8d4235835d693e7d27039e2971e3842087c82390d2e8c93b2c15"
+    "browser/config/version.txt": "c4f243e36220bcb490f78858b00d25da05737a00d1062a48a7d1ee6a6ca555c9"
   }
 }
