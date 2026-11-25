@@ -140,6 +140,33 @@ def ensure_release_android(env):
     return ensure_release_ndk(env)
 
 
+def ensure_release_rust(env):
+    """Install the Rust artifact pinned by the Firefox source revision.
+
+    The build disk is intentionally persistent.  That means its previous
+    Rust artifact can be older than the compiler floor raised by a new
+    Firefox release.  Refresh it once per pinned revision before configure
+    invokes the compiler, rather than letting a long release run fail there.
+    """
+    marker = DISK / 'mozbuild' / 'white-fox-rust-toolchain.json'
+    try:
+        prepared = json.loads(marker.read_text())
+    except (FileNotFoundError, json.JSONDecodeError):
+        prepared = {}
+    rustc = DISK / 'mozbuild' / 'rustc' / 'bin' / 'rustc'
+    if prepared.get('revision') != UPSTREAM['revision'] or not rustc.is_file():
+        print('Installing Firefox-required Rust toolchain', flush=True)
+        logged(
+            [str(SOURCE / 'mach'), 'artifact', 'toolchain', '--from-build', 'linux64-rust-android'],
+            'release-rust', env, cwd=DISK / 'mozbuild',
+        )
+        if not rustc.is_file():
+            raise RuntimeError(f'Rust toolchain installation is incomplete: {rustc}')
+        marker.write_text(json.dumps({'revision': UPSTREAM['revision']}))
+    version = subprocess.check_output([str(rustc), '--version'], text=True).strip()
+    print(f'Firefox Rust toolchain: {version}', flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('stage', choices=['inspect', 'inspect-branding', 'export-branding', 'verify-branding', 'release', 'release-ui', 'release-applied', 'apply', 'bootstrap', 'retry-bootstrap', 'android-help', 'android-build', 'rust-build', 'build', 'pipeline', 'collect', 'network', 'logs'])
@@ -248,6 +275,7 @@ def main():
             config = PROJECT / 'config/mozconfig.arm64'
             status.write_text(json.dumps({'status': 'running', 'stage': 'Android SDK/NDK'}), encoding='utf-8')
             ndk = ensure_release_android(env)
+            ensure_release_rust(env)
             sdk = DISK / 'mozbuild/android-sdk-linux'
             java = sorted((DISK / 'mozbuild/jdk').glob('*/bin/java'))[-1]
             contents = config.read_text()
